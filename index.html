@@ -24,7 +24,7 @@
         .question.active {
             display: block;
         }
-        label{
+        label {
             margin-top: 3px;
         }
         button {
@@ -52,130 +52,162 @@
             margin-top: 20px;
             color: #555;
         }
+        .home-container {
+            text-align: center;
+        }
+        .slider-label {
+            display: block;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div id="homeContainer" class="home-container">
+            <h1>Welcome to the Exam</h1>
+            <label class="slider-label">Select number of True/False questions:</label>
+            <input type="range" id="tfCount" min="1" max="0" value="5" oninput="updateValue('tfCountValue', this.value)">
+            <span id="tfCountValue">1</span>
+            <br>
+            <label class="slider-label">Select number of Multiple Choice questions:</label>
+            <input type="range" id="mcCount" min="1" max="0" value="5" oninput="updateValue('mcCountValue', this.value)">
+            <span id="mcCountValue">1</span>
+            <br>
+            <button onclick="startExam()">Start the Exam</button>
+        </div>
         <div id="questionsContainer"></div>
-        <button id="prevBtn" onclick="prevQuestion()">Previous</button>
-        <button id="nextBtn" onclick="nextQuestion()">Next</button>
-        <button id="submitBtn" onclick="submitExam()">Submit</button>
+        <button id="prevBtn" onclick="prevQuestion()" style="display: none;">Previous</button>
+        <button id="nextBtn" onclick="nextQuestion()" style="display: none;">Next</button>
+        <button id="submitBtn" onclick="submitExam()" style="display: none;">Submit</button>
         <div id="resultContainer"></div>
     </div>
     <footer>Developed by Badr El sheshtawy</footer>
 
     <script>
- const questions = [
-            // True/False Questions
-            { type: 'tf', question: 'A requirement is a condition or capability needed by a user to solve a problem.', answer: 'T' },
-            { type: 'tf', question: 'Business requirements describe the high-level objectives of the organization implementing the system.', answer: 'T' },
-            { type: 'tf', question: 'User requirements describe the technical specifications needed for system development.', answer: 'F' },
-            { type: 'tf', question: 'Functional requirements specify the software functionality that developers must build into the product.', answer: 'T' },
-            { type: 'tf', question: 'A feature is a single requirement that provides a capability to the user.', answer: 'T' },
-            { type: 'tf', question: 'Requirements specifications should include design or implementation details.', answer: 'F' },
-            { type: 'tf', question: 'Insufficient user involvement is a common risk in requirements engineering.', answer: 'T' },
-            { type: 'tf', question: 'Scope creep refers to the tendency of requirements to increase during development.', answer: 'T' },
-            { type: 'tf', question: 'Ambiguous requirements often lead to misunderstandings and incorrect implementations.', answer: 'T' },
-            { type: 'tf', question: 'Gold plating is the addition of unnecessary features by developers.', answer: 'T' },
-            { type: 'tf', question: 'Minimal specification often leads to frustration among developers and customers.', answer: 'T' },
-            { type: 'tf', question: 'Overlooked user classes can result in unmet user needs.', answer: 'T' },
-            { type: 'tf', question: 'Inaccurate planning can be caused by frequent requirements changes.', answer: 'T' },
-            { type: 'tf', question: 'Effective requirements engineering can reduce development rework.', answer: 'T' },
-            { type: 'tf', question: 'Complete requirements fully describe the functionality to be delivered.', answer: 'T' },
-            { type: 'tf', question: 'Correct requirements accurately describe the functionality to be built.', answer: 'T' },
-            { type: 'tf', question: 'Feasible requirements are those that can be implemented within known limitations.', answer: 'T' },
-            { type: 'tf', question: 'Necessary requirements document capabilities that customers truly need.', answer: 'T' },
-            { type: 'tf', question: 'Prioritized requirements indicate the implementation priority.', answer: 'T' },
-            { type: 'tf', question: 'Unambiguous requirements can be interpreted in multiple ways.', answer: 'F' },
-            { type: 'tf', question: 'Verifiable requirements can be tested to ensure they are met.', answer: 'T' },
-            { type: 'tf', question: 'The requirements analyst is responsible for gathering and documenting requirements.', answer: 'T' },
-            { type: 'tf', question: 'Requirements analysts do not need to have good communication skills.', answer: 'F' },
-            { type: 'tf', question: 'Business requirements define the project\'s business objectives.', answer: 'T' },
-            { type: 'tf', question: 'Eliciting requirements involves gathering system capabilities from users.', answer: 'T' },
-            { type: 'tf', question: 'Analyzing requirements includes identifying derived requirements.', answer: 'T' },
-            { type: 'tf', question: 'Writing requirements specifications is not part of the analyst\'s role.', answer: 'F' },
-            { type: 'tf', question: 'Requirements management involves managing requirements throughout the project lifecycle.', answer: 'T' },
-            { type: 'tf', question: 'User questionnaires are a common source of requirements.', answer: 'T' },
-            { type: 'tf', question: 'Observing users at work can help gather requirements.', answer: 'T' },
-            { type: 'tf', question: 'Scenario analysis involves identifying tasks users need to accomplish.', answer: 'T' },
-            { type: 'tf', question: 'Requirements engineering (RE) includes requirements validation.', answer: 'T' },
-            { type: 'tf', question: 'Requirements elicitation is the process of interviewing stakeholders.', answer: 'T' },
-            { type: 'tf', question: 'Conducting interviews involves identifying candidates and preparing questions.', answer: 'T' },
-            { type: 'tf', question: 'Brainstorming is a group technique for generating ideas without criticism.', answer: 'T' },
-            { type: 'tf', question: 'JAD sessions involve users, project team, and management to identify requirements.', answer: 'T' },
-            { type: 'tf', question: 'Brainstorming sessions typically involve 20-30 people.', answer: 'F' },
-            { type: 'tf', question: 'Consolidation phase in brainstorming involves reviewing and prioritizing ideas.', answer: 'T' },
-            { type: 'tf', question: 'JAD sessions can reduce scope creep by 50%.', answer: 'T' },
-            { type: 'tf', question: 'A JAD facilitator must remain neutral during sessions.', answer: 'T' },
-            { type: 'tf', question: 'Conducting interviews requires the development of social skills and listening abilities.', answer: 'T' },
-            { type: 'tf', question: 'The generation phase in brainstorming focuses on discussing and organizing ideas.', answer: 'F' },
-            { type: 'tf', question: 'A post-JAD follow-up involves preparing and circulating a session report.', answer: 'T' },
-            { type: 'tf', question: 'Eliciting requirements is the last step in requirements engineering.', answer: 'F' },
-            { type: 'tf', question: 'Interviews are a high-level elicitation technique used in small projects.', answer: 'F' },
-            { type: 'tf', question: 'The role of the analyst includes validating requirement statements.', answer: 'T' },
-            { type: 'tf', question: 'The requirements specification should be clear and unambiguous.', answer: 'T' },
-            { type: 'tf', question: 'Requirements analysts should not participate in reviews of requirements documents.', answer: 'F' },
-            { type: 'tf', question: 'Requirements management is only necessary during the initial project phase.', answer: 'F' },
-            { type: 'tf', question: 'Users\' input is not important in the requirements engineering process.', answer: 'F' },
+         const questions = [
+// True/False Questions
+{ type: 'tf', question: 'A requirement is a condition or capability needed by a user to solve a problem.', answer: 'T' },
+{ type: 'tf', question: 'Business requirements describe the high-level objectives of the organization implementing the system.', answer: 'T' },
+{ type: 'tf', question: 'User requirements describe the technical specifications needed for system development.', answer: 'F' },
+{ type: 'tf', question: 'Functional requirements specify the software functionality that developers must build into the product.', answer: 'T' },
+{ type: 'tf', question: 'A feature is a single requirement that provides a capability to the user.', answer: 'T' },
+{ type: 'tf', question: 'Requirements specifications should include design or implementation details.', answer: 'F' },
+{ type: 'tf', question: 'Insufficient user involvement is a common risk in requirements engineering.', answer: 'T' },
+{ type: 'tf', question: 'Scope creep refers to the tendency of requirements to increase during development.', answer: 'T' },
+{ type: 'tf', question: 'Ambiguous requirements often lead to misunderstandings and incorrect implementations.', answer: 'T' },
+{ type: 'tf', question: 'Gold plating is the addition of unnecessary features by developers.', answer: 'T' },
+{ type: 'tf', question: 'Minimal specification often leads to frustration among developers and customers.', answer: 'T' },
+{ type: 'tf', question: 'Overlooked user classes can result in unmet user needs.', answer: 'T' },
+{ type: 'tf', question: 'Inaccurate planning can be caused by frequent requirements changes.', answer: 'T' },
+{ type: 'tf', question: 'Effective requirements engineering can reduce development rework.', answer: 'T' },
+{ type: 'tf', question: 'Complete requirements fully describe the functionality to be delivered.', answer: 'T' },
+{ type: 'tf', question: 'Correct requirements accurately describe the functionality to be built.', answer: 'T' },
+{ type: 'tf', question: 'Feasible requirements are those that can be implemented within known limitations.', answer: 'T' },
+{ type: 'tf', question: 'Necessary requirements document capabilities that customers truly need.', answer: 'T' },
+{ type: 'tf', question: 'Prioritized requirements indicate the implementation priority.', answer: 'T' },
+{ type: 'tf', question: 'Unambiguous requirements can be interpreted in multiple ways.', answer: 'F' },
+{ type: 'tf', question: 'Verifiable requirements can be tested to ensure they are met.', answer: 'T' },
+{ type: 'tf', question: 'The requirements analyst is responsible for gathering and documenting requirements.', answer: 'T' },
+{ type: 'tf', question: 'Requirements analysts do not need to have good communication skills.', answer: 'F' },
+{ type: 'tf', question: 'Business requirements define the project\'s business objectives.', answer: 'T' },
+{ type: 'tf', question: 'Eliciting requirements involves gathering system capabilities from users.', answer: 'T' },
+{ type: 'tf', question: 'Analyzing requirements includes identifying derived requirements.', answer: 'T' },
+{ type: 'tf', question: 'Writing requirements specifications is not part of the analyst\'s role.', answer: 'F' },
+{ type: 'tf', question: 'Requirements management involves managing requirements throughout the project lifecycle.', answer: 'T' },
+{ type: 'tf', question: 'User questionnaires are a common source of requirements.', answer: 'T' },
+{ type: 'tf', question: 'Observing users at work can help gather requirements.', answer: 'T' },
+{ type: 'tf', question: 'Scenario analysis involves identifying tasks users need to accomplish.', answer: 'T' },
+{ type: 'tf', question: 'Requirements engineering (RE) includes requirements validation.', answer: 'T' },
+{ type: 'tf', question: 'Requirements elicitation is the process of interviewing stakeholders.', answer: 'T' },
+{ type: 'tf', question: 'Conducting interviews involves identifying candidates and preparing questions.', answer: 'T' },
+{ type: 'tf', question: 'Brainstorming is a group technique for generating ideas without criticism.', answer: 'T' },
+{ type: 'tf', question: 'JAD sessions involve users, project team, and management to identify requirements.', answer: 'T' },
+{ type: 'tf', question: 'Brainstorming sessions typically involve 20-30 people.', answer: 'F' },
+{ type: 'tf', question: 'Consolidation phase in brainstorming involves reviewing and prioritizing ideas.', answer: 'T' },
+{ type: 'tf', question: 'JAD sessions can reduce scope creep by 50%.', answer: 'T' },
+{ type: 'tf', question: 'A JAD facilitator must remain neutral during sessions.', answer: 'T' },
+{ type: 'tf', question: 'Conducting interviews requires the development of social skills and listening abilities.', answer: 'T' },
+{ type: 'tf', question: 'The generation phase in brainstorming focuses on discussing and organizing ideas.', answer: 'F' },
+{ type: 'tf', question: 'A post-JAD follow-up involves preparing and circulating a session report.', answer: 'T' },
+{ type: 'tf', question: 'Eliciting requirements is the last step in requirements engineering.', answer: 'F' },
+{ type: 'tf', question: 'Interviews are a high-level elicitation technique used in small projects.', answer: 'F' },
+{ type: 'tf', question: 'The role of the analyst includes validating requirement statements.', answer: 'T' },
+{ type: 'tf', question: 'The requirements specification should be clear and unambiguous.', answer: 'T' },
+{ type: 'tf', question: 'Requirements analysts should not participate in reviews of requirements documents.', answer: 'F' },
+{ type: 'tf', question: 'Requirements management is only necessary during the initial project phase.', answer: 'F' },
+{ type: 'tf', question: 'Users\' input is not important in the requirements engineering process.', answer: 'F' },
 
-            // Multiple Choice Questions
-            { type: 'mc', question: 'What are the three levels of requirements?', options: ['A) Business, User, Functional', 'B) System, Design, Implementation', 'C) Technical, Non-technical, User', 'D) High-level, Low-level, Middle-level'], answer: 'A) Business, User, Functional' },
-            { type: 'mc', question: 'Business requirements describe:', options: ['A) User goals or tasks', 'B) High-level objectives of the organization', 'C) Software functionality', 'D) Design specifications'], answer: 'B) High-level objectives of the organization' },
-            { type: 'mc', question: 'Which of the following is a feature?', options: ['A) A single requirement', 'B) A set of related functional requirements', 'C) A user interface element', 'D) A design specification'], answer: 'B) A set of related functional requirements' },
-            { type: 'mc', question: 'What should not be included in requirements specifications?', options: ['A) User needs', 'B) Functional requirements', 'C) Design details', 'D) Business rules'], answer: 'C) Design details' },
-            { type: 'mc', question: 'Which of the following is a risk in requirements engineering?', options: ['A) Over-documentation', 'B) User involvement', 'C) Scope creep', 'D) Feature reduction'], answer: 'C) Scope creep' },
-            { type: 'mc', question: 'Ambiguous requirements lead to:', options: ['A) Accurate implementations', 'B) Misunderstandings', 'C) Increased clarity', 'D) Reduced complexity'], answer: 'B) Misunderstandings' },
-            { type: 'mc', question: 'Gold plating is the process of:', options: ['A) Removing unnecessary features', 'B) Adding unnecessary features', 'C) Simplifying requirements', 'D) Documenting requirements'], answer: 'B) Adding unnecessary features' },
-            { type: 'mc', question: 'Minimal specification often results in:', options: ['A) Clear understanding', 'B) Complete satisfaction', 'C) Developer frustration', 'D) Improved productivity'], answer: 'C) Developer frustration' },
-            { type: 'mc', question: 'Overlooked user classes can lead to:', options: ['A) Unmet needs', 'B) Increased satisfaction', 'C) Enhanced features', 'D) Reduced scope'], answer: 'A) Unmet needs' },
-            { type: 'mc', question: 'Frequent requirements changes can cause:', options: ['A) Accurate planning', 'B) Inaccurate planning', 'C) Increased stability', 'D) Reduced risk'], answer: 'B) Inaccurate planning' },
-            { type: 'mc', question: 'Effective requirements engineering can:', options: ['A) Increase rework', 'B) Reduce development rework', 'C) Increase risk', 'D) Decrease user satisfaction'], answer: 'B) Reduce development rework' },
-            { type: 'mc', question: 'Complete requirements:', options: ['A) Fully describe the system\'s functionality', 'B) Are subject to interpretation', 'C) Are unnecessary', 'D) Simplify the design'], answer: 'A) Fully describe the system\'s functionality' },
-            { type: 'mc', question: 'Correct requirements:', options: ['A) Are ambiguous', 'B) Accurately describe the functionality to be built', 'C) Are not necessary', 'D) Complicate the development process'], answer: 'B) Accurately describe the functionality to be built' },
-            { type: 'mc', question: 'Feasible requirements are:', options: ['A) Easily achievable', 'B) Impossible to implement', 'C) Implementable within known limitations', 'D) Too complex'], answer: 'C) Implementable within known limitations' },
-            { type: 'mc', question: 'Necessary requirements:', options: ['A) Are optional', 'B) Document capabilities that are truly needed', 'C) Add extra features', 'D) Simplify the process'], answer: 'B) Document capabilities that are truly needed' },
-            { type: 'mc', question: 'Prioritized requirements:', options: ['A) Indicate the implementation order', 'B) Are not important', 'C) Are always implemented first', 'D) Simplify the design'], answer: 'A) Indicate the implementation order' },
-            { type: 'mc', question: 'Unambiguous requirements:', options: ['A) Can be interpreted in multiple ways', 'B) Are clear and precise', 'C) Are not necessary', 'D) Complicate the process'], answer: 'B) Are clear and precise' },
-            { type: 'mc', question: 'Verifiable requirements:', options: ['A) Cannot be tested', 'B) Can be tested to ensure they are met', 'C) Are optional', 'D) Complicate testing'], answer: 'B) Can be tested to ensure they are met' },
-            { type: 'mc', question: 'The requirements analyst is responsible for:', options: ['A) Coding the system', 'B) Gathering and documenting requirements', 'C) Designing the database', 'D) Writing user manuals'], answer: 'B) Gathering and documenting requirements' },
-            { type: 'mc', question: 'Requirements analysts should have:', options: ['A) Poor communication skills', 'B) Good communication skills', 'C) No technical knowledge', 'D) No interest in user needs'], answer: 'B) Good communication skills' },
-            { type: 'mc', question: 'Business requirements define:', options: ['A) Technical specifications', 'B) The project\'s business objectives', 'C) User interface elements', 'D) Design patterns'], answer: 'B) The project\'s business objectives' },
-            { type: 'mc', question: 'Eliciting requirements involves:', options: ['A) Implementing the system', 'B) Gathering system capabilities from users', 'C) Testing the system', 'D) Designing the architecture'], answer: 'B) Gathering system capabilities from users' },
-            { type: 'mc', question: 'Analyzing requirements includes:', options: ['A) Implementing requirements', 'B) Identifying derived requirements', 'C) Writing code', 'D) Designing the system'], answer: 'B) Identifying derived requirements' },
-            { type: 'mc', question: 'Requirements management involves:', options: ['A) Only the initial project phase', 'B) Managing requirements throughout the project lifecycle', 'C) Ignoring user feedback', 'D) Writing code'], answer: 'B) Managing requirements throughout the project lifecycle' },
-            { type: 'mc', question: 'User questionnaires are:', options: ['A) A common source of requirements', 'B) Not useful for gathering requirements', 'C) Used for coding', 'D) Used for testing'], answer: 'A) A common source of requirements' },
-            { type: 'mc', question: 'Observing users at work can:', options: ['A) Not provide useful information', 'B) Help gather requirements', 'C) Complicate the process', 'D) Be unnecessary'], answer: 'B) Help gather requirements' },
-            { type: 'mc', question: 'Scenario analysis involves:', options: ['A) Implementing the system', 'B) Identifying tasks users need to accomplish', 'C) Testing the system', 'D) Writing code'], answer: 'B) Identifying tasks users need to accomplish' },
-            { type: 'mc', question: 'Requirements engineering (RE) includes:', options: ['A) Writing code', 'B) Requirements validation', 'C) System testing', 'D) Database design'], answer: 'B) Requirements validation' },
-            { type: 'mc', question: 'Requirements elicitation is:', options: ['A) The process of implementing the system', 'B) The process of interviewing stakeholders', 'C) The process of testing the system', 'D) The process of designing the system'], answer: 'B) The process of interviewing stakeholders' },
-            { type: 'mc', question: 'Conducting interviews involves:', options: ['A) Writing code', 'B) Identifying candidates and preparing questions', 'C) Designing the system', 'D) Testing the system'], answer: 'B) Identifying candidates and preparing questions' },
-            { type: 'mc', question: 'Brainstorming is a group technique for:', options: ['A) Generating ideas without criticism', 'B) Implementing the system', 'C) Testing the system', 'D) Designing the system'], answer: 'A) Generating ideas without criticism' },
-            { type: 'mc', question: 'JAD sessions involve:', options: ['A) Only users', 'B) Only the project team', 'C) Only management', 'D) Users, project team, and management to identify requirements'], answer: 'D) Users, project team, and management to identify requirements' },
-            { type: 'mc', question: 'Brainstorming sessions typically involve:', options: ['A) 5-10 people', 'B) 20-30 people', 'C) 1-2 people', 'D) Over 50 people'], answer: 'A) 5-10 people' },
-            { type: 'mc', question: 'The consolidation phase in brainstorming involves:', options: ['A) Generating ideas', 'B) Reviewing and prioritizing ideas', 'C) Testing the system', 'D) Implementing the system'], answer: 'B) Reviewing and prioritizing ideas' },
-            { type: 'mc', question: 'JAD sessions can reduce scope creep by:', options: ['A) 10%', 'B) 25%', 'C) 50%', 'D) 75%'], answer: 'C) 50%' },
-            { type: 'mc', question: 'A JAD facilitator must:', options: ['A) Remain neutral during sessions', 'B) Take sides during discussions', 'C) Ignore user input', 'D) Focus on technical details'], answer: 'A) Remain neutral during sessions' },
-            { type: 'mc', question: 'Conducting interviews requires:', options: ['A) No preparation', 'B) Development of social skills and listening abilities', 'C) Only technical knowledge', 'D) Focus on coding'], answer: 'B) Development of social skills and listening abilities' },
-            { type: 'mc', question: 'The generation phase in brainstorming focuses on:', options: ['A) Discussing and organizing ideas', 'B) Generating ideas without criticism', 'C) Testing the system', 'D) Implementing the system'], answer: 'B) Generating ideas without criticism' },
-            { type: 'mc', question: 'A post-JAD follow-up involves:', options: ['A) Writing code', 'B) Testing the system', 'C) Preparing and circulating a session report', 'D) Ignoring the session outcomes'], answer: 'C) Preparing and circulating a session report' },
-            { type: 'mc', question: 'Eliciting requirements is:', options: ['A) The last step in requirements engineering', 'B) The first step in requirements engineering', 'C) Not necessary', 'D) Only done at the end'], answer: 'B) The first step in requirements engineering' },
-            { type: 'mc', question: 'Interviews are:', options: ['A) A high-level elicitation technique used in large projects', 'B) A low-level elicitation technique used in small projects', 'C) Not useful for gathering requirements', 'D) Only used for coding'], answer: 'A) A high-level elicitation technique used in large projects' },
-            { type: 'mc', question: 'The role of the analyst includes:', options: ['A) Writing code', 'B) Validating requirement statements', 'C) Designing the system', 'D) Testing the system'], answer: 'B) Validating requirement statements' },
-            { type: 'mc', question: 'The requirements specification should be:', options: ['A) Clear and unambiguous', 'B) Vague', 'C) Ambiguous', 'D) Complicated'], answer: 'A) Clear and unambiguous' },
-            { type: 'mc', question: 'Requirements analysts should not:', options: ['A) Participate in reviews of requirements documents', 'B) Write code', 'C) Validate requirements', 'D) Gather requirements'], answer: 'A) Participate in reviews of requirements documents' },
-            { type: 'mc', question: 'Requirements management is:', options: ['A) Only necessary during the initial project phase', 'B) Necessary throughout the project lifecycle', 'C) Not important', 'D) Only done during testing'], answer: 'B) Necessary throughout the project lifecycle' },
-            { type: 'mc', question: 'Users\' input is:', options: ['A) Not important in the requirements engineering process', 'B) Important in the requirements engineering process', 'C) Ignored', 'D) Only useful for testing'], answer: 'B) Important in the requirements engineering process' }
-        ];
- 
+// Multiple Choice Questions
+{ type: 'mc', question: 'What are the three levels of requirements?', options: ['A) Business, User, Functional', 'B) System, Design, Implementation', 'C) Technical, Non-technical, User', 'D) High-level, Low-level, Middle-level'], answer: 'A) Business, User, Functional' },
+{ type: 'mc', question: 'Business requirements describe:', options: ['A) User goals or tasks', 'B) High-level objectives of the organization', 'C) Software functionality', 'D) Design specifications'], answer: 'B) High-level objectives of the organization' },
+{ type: 'mc', question: 'Which of the following is a feature?', options: ['A) A single requirement', 'B) A set of related functional requirements', 'C) A user interface element', 'D) A design specification'], answer: 'B) A set of related functional requirements' },
+{ type: 'mc', question: 'What should not be included in requirements specifications?', options: ['A) User needs', 'B) Functional requirements', 'C) Design details', 'D) Business rules'], answer: 'C) Design details' },
+{ type: 'mc', question: 'Which of the following is a risk in requirements engineering?', options: ['A) Over-documentation', 'B) User involvement', 'C) Scope creep', 'D) Feature reduction'], answer: 'C) Scope creep' },
+{ type: 'mc', question: 'Ambiguous requirements lead to:', options: ['A) Accurate implementations', 'B) Misunderstandings', 'C) Increased clarity', 'D) Reduced complexity'], answer: 'B) Misunderstandings' },
+{ type: 'mc', question: 'Gold plating is the process of:', options: ['A) Removing unnecessary features', 'B) Adding unnecessary features', 'C) Simplifying requirements', 'D) Documenting requirements'], answer: 'B) Adding unnecessary features' },
+{ type: 'mc', question: 'Minimal specification often results in:', options: ['A) Clear understanding', 'B) Complete satisfaction', 'C) Developer frustration', 'D) Improved productivity'], answer: 'C) Developer frustration' },
+{ type: 'mc', question: 'Overlooked user classes can lead to:', options: ['A) Unmet needs', 'B) Increased satisfaction', 'C) Enhanced features', 'D) Reduced scope'], answer: 'A) Unmet needs' },
+{ type: 'mc', question: 'Frequent requirements changes can cause:', options: ['A) Accurate planning', 'B) Inaccurate planning', 'C) Increased stability', 'D) Reduced risk'], answer: 'B) Inaccurate planning' },
+{ type: 'mc', question: 'Effective requirements engineering can:', options: ['A) Increase rework', 'B) Reduce development rework', 'C) Increase risk', 'D) Decrease user satisfaction'], answer: 'B) Reduce development rework' },
+{ type: 'mc', question: 'Complete requirements:', options: ['A) Fully describe the system\'s functionality', 'B) Are subject to interpretation', 'C) Are unnecessary', 'D) Simplify the design'], answer: 'A) Fully describe the system\'s functionality' },
+{ type: 'mc', question: 'Correct requirements:', options: ['A) Are ambiguous', 'B) Accurately describe the functionality to be built', 'C) Are not necessary', 'D) Complicate the development process'], answer: 'B) Accurately describe the functionality to be built' },
+{ type: 'mc', question: 'Feasible requirements are:', options: ['A) Easily achievable', 'B) Impossible to implement', 'C) Implementable within known limitations', 'D) Too complex'], answer: 'C) Implementable within known limitations' },
+{ type: 'mc', question: 'Necessary requirements:', options: ['A) Are optional', 'B) Document capabilities that are truly needed', 'C) Add extra features', 'D) Simplify the process'], answer: 'B) Document capabilities that are truly needed' },
+{ type: 'mc', question: 'Prioritized requirements:', options: ['A) Indicate the implementation order', 'B) Are not important', 'C) Are always implemented first', 'D) Simplify the design'], answer: 'A) Indicate the implementation order' },
+{ type: 'mc', question: 'Unambiguous requirements:', options: ['A) Can be interpreted in multiple ways', 'B) Are clear and precise', 'C) Are not necessary', 'D) Complicate the process'], answer: 'B) Are clear and precise' },
+{ type: 'mc', question: 'Verifiable requirements:', options: ['A) Cannot be tested', 'B) Can be tested to ensure they are met', 'C) Are optional', 'D) Complicate testing'], answer: 'B) Can be tested to ensure they are met' },
+{ type: 'mc', question: 'The requirements analyst is responsible for:', options: ['A) Coding the system', 'B) Gathering and documenting requirements', 'C) Designing the database', 'D) Writing user manuals'], answer: 'B) Gathering and documenting requirements' },
+{ type: 'mc', question: 'Requirements analysts should have:', options: ['A) Poor communication skills', 'B) Good communication skills', 'C) No technical knowledge', 'D) No interest in user needs'], answer: 'B) Good communication skills' },
+{ type: 'mc', question: 'Business requirements define:', options: ['A) Technical specifications', 'B) The project\'s business objectives', 'C) User interface elements', 'D) Design patterns'], answer: 'B) The project\'s business objectives' },
+{ type: 'mc', question: 'Eliciting requirements involves:', options: ['A) Implementing the system', 'B) Gathering system capabilities from users', 'C) Testing the system', 'D) Designing the architecture'], answer: 'B) Gathering system capabilities from users' },
+{ type: 'mc', question: 'Analyzing requirements includes:', options: ['A) Implementing requirements', 'B) Identifying derived requirements', 'C) Writing code', 'D) Designing the system'], answer: 'B) Identifying derived requirements' },
+{ type: 'mc', question: 'Requirements management involves:', options: ['A) Only the initial project phase', 'B) Managing requirements throughout the project lifecycle', 'C) Ignoring user feedback', 'D) Writing code'], answer: 'B) Managing requirements throughout the project lifecycle' },
+{ type: 'mc', question: 'User questionnaires are:', options: ['A) A common source of requirements', 'B) Not useful for gathering requirements', 'C) Used for coding', 'D) Used for testing'], answer: 'A) A common source of requirements' },
+{ type: 'mc', question: 'Observing users at work can:', options: ['A) Not provide useful information', 'B) Help gather requirements', 'C) Complicate the process', 'D) Be unnecessary'], answer: 'B) Help gather requirements' },
+{ type: 'mc', question: 'Scenario analysis involves:', options: ['A) Implementing the system', 'B) Identifying tasks users need to accomplish', 'C) Testing the system', 'D) Writing code'], answer: 'B) Identifying tasks users need to accomplish' },
+{ type: 'mc', question: 'Requirements engineering (RE) includes:', options: ['A) Writing code', 'B) Requirements validation', 'C) System testing', 'D) Database design'], answer: 'B) Requirements validation' },
+{ type: 'mc', question: 'Requirements elicitation is:', options: ['A) The process of implementing the system', 'B) The process of interviewing stakeholders', 'C) The process of testing the system', 'D) The process of designing the system'], answer: 'B) The process of interviewing stakeholders' },
+{ type: 'mc', question: 'Conducting interviews involves:', options: ['A) Writing code', 'B) Identifying candidates and preparing questions', 'C) Designing the system', 'D) Testing the system'], answer: 'B) Identifying candidates and preparing questions' },
+{ type: 'mc', question: 'Brainstorming is a group technique for:', options: ['A) Generating ideas without criticism', 'B) Implementing the system', 'C) Testing the system', 'D) Designing the system'], answer: 'A) Generating ideas without criticism' },
+{ type: 'mc', question: 'JAD sessions involve:', options: ['A) Only users', 'B) Only the project team', 'C) Only management', 'D) Users, project team, and management to identify requirements'], answer: 'D) Users, project team, and management to identify requirements' },
+{ type: 'mc', question: 'Brainstorming sessions typically involve:', options: ['A) 5-10 people', 'B) 20-30 people', 'C) 1-2 people', 'D) Over 50 people'], answer: 'A) 5-10 people' },
+{ type: 'mc', question: 'The consolidation phase in brainstorming involves:', options: ['A) Generating ideas', 'B) Reviewing and prioritizing ideas', 'C) Testing the system', 'D) Implementing the system'], answer: 'B) Reviewing and prioritizing ideas' },
+{ type: 'mc', question: 'JAD sessions can reduce scope creep by:', options: ['A) 10%', 'B) 25%', 'C) 50%', 'D) 75%'], answer: 'C) 50%' },
+{ type: 'mc', question: 'A JAD facilitator must:', options: ['A) Remain neutral during sessions', 'B) Take sides during discussions', 'C) Ignore user input', 'D) Focus on technical details'], answer: 'A) Remain neutral during sessions' },
+{ type: 'mc', question: 'Conducting interviews requires:', options: ['A) No preparation', 'B) Development of social skills and listening abilities', 'C) Only technical knowledge', 'D) Focus on coding'], answer: 'B) Development of social skills and listening abilities' },
+{ type: 'mc', question: 'The generation phase in brainstorming focuses on:', options: ['A) Discussing and organizing ideas', 'B) Generating ideas without criticism', 'C) Testing the system', 'D) Implementing the system'], answer: 'B) Generating ideas without criticism' },
+{ type: 'mc', question: 'A post-JAD follow-up involves:', options: ['A) Writing code', 'B) Testing the system', 'C) Preparing and circulating a session report', 'D) Ignoring the session outcomes'], answer: 'C) Preparing and circulating a session report' },
+{ type: 'mc', question: 'Eliciting requirements is:', options: ['A) The last step in requirements engineering', 'B) The first step in requirements engineering', 'C) Not necessary', 'D) Only done at the end'], answer: 'B) The first step in requirements engineering' },
+{ type: 'mc', question: 'Interviews are:', options: ['A) A high-level elicitation technique used in large projects', 'B) A low-level elicitation technique used in small projects', 'C) Not useful for gathering requirements', 'D) Only used for coding'], answer: 'A) A high-level elicitation technique used in large projects' },
+{ type: 'mc', question: 'The role of the analyst includes:', options: ['A) Writing code', 'B) Validating requirement statements', 'C) Designing the system', 'D) Testing the system'], answer: 'B) Validating requirement statements' },
+{ type: 'mc', question: 'The requirements specification should be:', options: ['A) Clear and unambiguous', 'B) Vague', 'C) Ambiguous', 'D) Complicated'], answer: 'A) Clear and unambiguous' },
+{ type: 'mc', question: 'Requirements analysts should not:', options: ['A) Participate in reviews of requirements documents', 'B) Write code', 'C) Validate requirements', 'D) Gather requirements'], answer: 'A) Participate in reviews of requirements documents' },
+{ type: 'mc', question: 'Requirements management is:', options: ['A) Only necessary during the initial project phase', 'B) Necessary throughout the project lifecycle', 'C) Not important', 'D) Only done during testing'], answer: 'B) Necessary throughout the project lifecycle' },
+{ type: 'mc', question: 'Users\' input is:', options: ['A) Not important in the requirements engineering process', 'B) Important in the requirements engineering process', 'C) Ignored', 'D) Only useful for testing'], answer: 'B) Important in the requirements engineering process' }
+];
 
 
         let currentQuestionIndex = 0;
-        let userAnswers = new Array(questions.length).fill(null);
+        let userAnswers = [];
+        let selectedTFCount = 0;
+        let selectedMCCount = 0;
+        let selectedQuestions = [];
 
         document.addEventListener('DOMContentLoaded', () => {
+            updateRangeValues();
             shuffleQuestions();
-            displayQuestion();
         });
+
+        function updateRangeValues() {
+            const tfRange = document.getElementById('tfCount');
+            const mcRange = document.getElementById('mcCount');
+            tfRange.max = questions.filter(q => q.type === 'tf').length;
+            mcRange.max = questions.filter(q => q.type === 'mc').length;
+        }
+
+        function updateValue(id, value) {
+            document.getElementById(id).innerText = value;
+        }
 
         function shuffleQuestions() {
             for (let i = questions.length - 1; i > 0; i--) {
@@ -184,10 +216,28 @@
             }
         }
 
+        function startExam() {
+            selectedTFCount = parseInt(document.getElementById('tfCount').value);
+            selectedMCCount = parseInt(document.getElementById('mcCount').value);
+            selectedQuestions = getSelectedQuestions();
+            userAnswers = new Array(selectedQuestions.length).fill(null);
+            document.getElementById('homeContainer').style.display = 'none';
+            document.getElementById('prevBtn').style.display = 'inline-block';
+            document.getElementById('nextBtn').style.display = 'inline-block';
+            document.getElementById('submitBtn').style.display = 'inline-block';
+            displayQuestion();
+        }
+
+        function getSelectedQuestions() {
+            const tfQuestions = questions.filter(q => q.type === 'tf').slice(0, selectedTFCount);
+            const mcQuestions = questions.filter(q => q.type === 'mc').slice(0, selectedMCCount);
+            return [...tfQuestions, ...mcQuestions];
+        }
+
         function displayQuestion() {
             const container = document.getElementById('questionsContainer');
             container.innerHTML = '';
-            const questionObj = questions[currentQuestionIndex];
+            const questionObj = selectedQuestions[currentQuestionIndex];
             const questionElement = document.createElement('div');
             questionElement.classList.add('question', 'active');
             questionElement.innerHTML = `<p>Question ${currentQuestionIndex + 1}: ${questionObj.question}</p>`;
@@ -204,8 +254,12 @@
                     `;
                 });
             }
-
             container.appendChild(questionElement);
+
+            if (userAnswers[currentQuestionIndex] !== null) {
+                const selectedOption = document.querySelector(`input[name="answer"][value="${userAnswers[currentQuestionIndex]}"]`);
+                if (selectedOption) selectedOption.checked = true;
+            }
         }
 
         function prevQuestion() {
@@ -217,7 +271,7 @@
         }
 
         function nextQuestion() {
-            if (currentQuestionIndex < questions.length - 1) {
+            if (currentQuestionIndex < selectedQuestions.length - 1) {
                 saveAnswer();
                 currentQuestionIndex++;
                 displayQuestion();
@@ -225,42 +279,48 @@
         }
 
         function saveAnswer() {
-            const selectedAnswer = document.querySelector('input[name="answer"]:checked');
-            if (selectedAnswer) {
-                userAnswers[currentQuestionIndex] = selectedAnswer.value;
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            if (selectedOption) {
+                userAnswers[currentQuestionIndex] = selectedOption.value;
             }
         }
 
         function submitExam() {
             saveAnswer();
-            let correctCount = 0;
-            const incorrectAnswers = [];
-            questions.forEach((question, index) => {
+            let score = 0;
+            let correctAnswers = [];
+            selectedQuestions.forEach((question, index) => {
                 if (userAnswers[index] === question.answer) {
-                    correctCount++;
+                    score++;
                 } else {
-                    incorrectAnswers.push({ question: question.question, correctAnswer: question.answer, userAnswer: userAnswers[index] });
+                    correctAnswers.push({ question: question.question, correctAnswer: question.answer, userAnswer: userAnswers[index] });
                 }
             });
-            displayResults(correctCount, incorrectAnswers);
-        }
 
-        function displayResults(correctCount, incorrectAnswers) {
             const resultContainer = document.getElementById('resultContainer');
-            resultContainer.innerHTML = `<p>You got ${correctCount} out of ${questions.length} questions correct.</p>`;
-            
-            if (incorrectAnswers.length > 0) {
-                resultContainer.innerHTML += '<h3>Incorrect Answers:</h3>';
-                incorrectAnswers.forEach(item => {
-                    const resultDiv = document.createElement('div');
-                    resultDiv.classList.add('result');
-                    resultDiv.innerHTML = `<p>Question: ${item.question}</p>
-                                           <p>Your Answer: ${item.userAnswer || 'No answer'}</p>
-                                           <p>Correct Answer: ${item.correctAnswer}</p>`;
-                    resultContainer.appendChild(resultDiv);
+            resultContainer.innerHTML = `<div class="result">You scored ${score} out of ${selectedQuestions.length}</div>`;
+
+            if (score === selectedQuestions.length) {
+                resultContainer.innerHTML += '<div class="result">Congratulations! You got a perfect score!</div>';
+            } else {
+                correctAnswers.forEach(({ question, correctAnswer, userAnswer }) => {
+                    resultContainer.innerHTML += `
+                        <div class="result">
+                            <p>Question: ${question}</p>
+                            <p>Correct Answer: ${correctAnswer}</p>
+                            <p>Your Answer: ${userAnswer}</p>
+                        </div>
+                    `;
                 });
             }
+
+            document.getElementById('prevBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('homeContainer').style.display = 'block';
         }
     </script>
 </body>
 </html>
+
+
