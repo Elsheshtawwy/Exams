@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Software Requirements Exam</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f0f8ff;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .question {
+            display: none;
+        }
+        .question.active {
+            display: block;
+        }
+        label {
+            margin-top: 3px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #resultContainer {
+            margin-top: 20px;
+        }
+        .result {
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #555;
+        }
+        .home-container {
+            text-align: center;
+        }
+        .slider-label {
+            display: block;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="homeContainer" class="home-container">
+            <h1>Welcome to the Exam</h1>
+            <label class="slider-label">Select number of True/False questions:</label>
+            <input type="range" id="tfCount" min="1" max="0" value="5" oninput="updateValue('tfCountValue', this.value)">
+            <span id="tfCountValue">1</span>
+            <br>
+            <label class="slider-label">Select number of Multiple Choice questions:</label>
+            <input type="range" id="mcCount" min="1" max="0" value="5" oninput="updateValue('mcCountValue', this.value)">
+            <span id="mcCountValue">1</span>
+            <br>
+            <button onclick="startExam()">Start the Exam</button>
+        </div>
+        <div id="questionsContainer"></div>
+        <button id="prevBtn" onclick="prevQuestion()" style="display: none;">Previous</button>
+        <button id="nextBtn" onclick="nextQuestion()" style="display: none;">Next</button>
+        <button id="submitBtn" onclick="submitExam()" style="display: none;">Submit</button>
+        <div id="resultContainer"></div>
+    </div>
+    <footer>Developed by Badr El sheshtawy</footer>
+
+    <script>
+         const questions = [
+    // True/False Questions
+    { type: 'tf', question: 'A requirement is a condition or capability needed by a user to solve a problem.', answer: 'T' },
+    { type: 'tf', question: 'Business requirements describe the high-level objectives of the organization implementing the system.', answer: 'T' },
+    { type: 'tf', question: 'User requirements describe the technical specifications needed for system development.', answer: 'F' },
+    { type: 'tf', question: 'Functional requirements specify the software functionality that developers must build into the product.', answer: 'T' },
+    { type: 'tf', question: 'A feature is a single requirement that provides a capability to the user.', answer: 'T' },
+    { type: 'tf', question: 'Requirements specifications should include design or implementation details.', answer: 'F' },
+    { type: 'tf', question: 'Insufficient user involvement is a common risk in requirements engineering.', answer: 'T' },
+    { type: 'tf', question: 'Scope creep refers to the tendency of requirements to increase during development.', answer: 'T' },
+    { type: 'tf', question: 'Ambiguous requirements often lead to misunderstandings and incorrect implementations.', answer: 'T' },
+    { type: 'tf', question: 'Gold plating is the addition of unnecessary features by developers.', answer: 'T' },
+    { type: 'tf', question: 'Minimal specification often leads to frustration among developers and customers.', answer: 'T' },
+    { type: 'tf', question: 'Overlooked user classes can result in unmet user needs.', answer: 'T' },
+    { type: 'tf', question: 'Inaccurate planning can be caused by frequent requirements changes.', answer: 'T' },
+    { type: 'tf', question: 'Effective requirements engineering can reduce development rework.', answer: 'T' },
+    { type: 'tf', question: 'Complete requirements fully describe the functionality to be delivered.', answer: 'T' },
+    { type: 'tf', question: 'Correct requirements accurately describe the functionality to be built.', answer: 'T' },
+    { type: 'tf', question: 'Feasible requirements are those that can be implemented within known limitations.', answer: 'T' },
+    { type: 'tf', question: 'Necessary requirements document capabilities that customers truly need.', answer: 'T' },
+    { type: 'tf', question: 'Prioritized requirements indicate the implementation priority.', answer: 'T' },
+    { type: 'tf', question: 'Unambiguous requirements can be interpreted in multiple ways.', answer: 'F' },
+    { type: 'tf', question: 'Verifiable requirements can be tested to ensure they are met.', answer: 'T' },
+    { type: 'tf', question: 'The requirements analyst is responsible for gathering and documenting requirements.', answer: 'T' },
+    { type: 'tf', question: 'Requirements analysts do not need to have good communication skills.', answer: 'F' },
+    { type: 'tf', question: 'Business requirements define the project\'s business objectives.', answer: 'T' },
+    { type: 'tf', question: 'Eliciting requirements involves gathering system capabilities from users.', answer: 'T' },
+    { type: 'tf', question: 'Analyzing requirements includes identifying derived requirements.', answer: 'T' },
+    { type: 'tf', question: 'Writing requirements specifications is not part of the analyst\'s role.', answer: 'F' },
+    { type: 'tf', question: 'Requirements management involves managing requirements throughout the project lifecycle.', answer: 'T' },
+    { type: 'tf', question: 'User questionnaires are a common source of requirements.', answer: 'T' },
+    { type: 'tf', question: 'Observing users at work can help gather requirements.', answer: 'T' },
+    { type: 'tf', question: 'Scenario analysis involves identifying tasks users need to accomplish.', answer: 'T' },
+    { type: 'tf', question: 'Requirements engineering (RE) includes requirements validation.', answer: 'T' },
+    { type: 'tf', question: 'Requirements elicitation is the process of interviewing stakeholders.', answer: 'T' },
+    { type: 'tf', question: 'Conducting interviews involves identifying candidates and preparing questions.', answer: 'T' },
+    { type: 'tf', question: 'Brainstorming is a group technique for generating ideas without criticism.', answer: 'T' },
+    { type: 'tf', question: 'JAD sessions involve users, project team, and management to identify requirements.', answer: 'T' },
+    { type: 'tf', question: 'Brainstorming sessions typically involve 20-30 people.', answer: 'F' },
+    { type: 'tf', question: 'Consolidation phase in brainstorming involves reviewing and prioritizing ideas.', answer: 'T' },
+    { type: 'tf', question: 'JAD sessions can reduce scope creep by 50%.', answer: 'T' },
+    { type: 'tf', question: 'A JAD facilitator must remain neutral during sessions.', answer: 'T' },
+    { type: 'tf', question: 'Conducting interviews requires the development of social skills and listening abilities.', answer: 'T' },
+    { type: 'tf', question: 'The generation phase in brainstorming focuses on discussing and organizing ideas.', answer: 'F' },
+    { type: 'tf', question: 'A post-JAD follow-up involves preparing and circulating a session report.', answer: 'T' },
+    { type: 'tf', question: 'Eliciting requirements is the last step in requirements engineering.', answer: 'F' },
+    { type: 'tf', question: 'Interviews are a high-level elicitation technique used in small projects.', answer: 'F' },
+    { type: 'tf', question: 'The role of the analyst includes validating requirement statements.', answer: 'T' },
+    { type: 'tf', question: 'The requirements specification should be clear and unambiguous.', answer: 'T' },
+    { type: 'tf', question: 'Requirements analysts should not participate in reviews of requirements documents.', answer: 'F' },
+    { type: 'tf', question: 'Requirements management is only necessary during the initial project phase.', answer: 'F' },
+    { type: 'tf', question: 'Users\' input is not important in the requirements engineering process.', answer: 'F' },
+
+    // Multiple Choice Questions
+    { type: 'mc', question: 'What are the three levels of requirements?', options: ['A) Business, User, Functional', 'B) System, Design, Implementation', 'C) Technical, Non-technical, User', 'D) High-level, Low-level, Middle-level'], answer: 'A) Business, User, Functional' },
+    { type: 'mc', question: 'Business requirements describe:', options: ['A) User goals or tasks', 'B) High-level objectives of the organization', 'C) Software functionality', 'D) Design specifications'], answer: 'B) High-level objectives of the organization' },
+    { type: 'mc', question: 'Which of the following is a feature?', options: ['A) A single requirement', 'B) A set of related functional requirements', 'C) A user interface element', 'D) A design specification'], answer: 'B) A set of related functional requirements' },
+    { type: 'mc', question: 'What should not be included in requirements specifications?', options: ['A) User needs', 'B) Functional requirements', 'C) Design details', 'D) Business rules'], answer: 'C) Design details' },
+    { type: 'mc', question: 'Which of the following is a risk in requirements engineering?', options: ['A) Over-documentation', 'B) User involvement', 'C) Scope creep', 'D) Feature reduction'], answer: 'C) Scope creep' },
+    { type: 'mc', question: 'Ambiguous requirements lead to:', options: ['A) Accurate implementations', 'B) Misunderstandings', 'C) Increased clarity', 'D) Reduced complexity'], answer: 'B) Misunderstandings' },
+    { type: 'mc', question: 'Gold plating is the process of:', options: ['A) Removing unnecessary features', 'B) Adding unnecessary features', 'C) Simplifying requirements', 'D) Documenting requirements'], answer: 'B) Adding unnecessary features' },
+    { type: 'mc', question: 'Minimal specification often results in:', options: ['A) Clear understanding', 'B) Complete satisfaction', 'C) Developer frustration', 'D) Improved productivity'], answer: 'C) Developer frustration' },
+    { type: 'mc', question: 'Overlooked user classes can lead to:', options: ['A) Unmet needs', 'B) Increased satisfaction', 'C) Enhanced features', 'D) Reduced scope'], answer: 'A) Unmet needs' },
+    { type: 'mc', question: 'Frequent requirements changes can cause:', options: ['A) Accurate planning', 'B) Inaccurate planning', 'C) Increased stability', 'D) Reduced risk'], answer: 'B) Inaccurate planning' },
+    { type: 'mc', question: 'Effective requirements engineering can:', options: ['A) Increase rework', 'B) Reduce development rework', 'C) Increase risk', 'D) Decrease documentation'], answer: 'B) Reduce development rework' },
+    { type: 'mc', question: 'Complete requirements fully describe:', options: ['A) The development team', 'B) The project schedule', 'C) The functionality to be delivered', 'D) The user interface'], answer: 'C) The functionality to be delivered' },
+    { type: 'mc', question: 'Correct requirements accurately describe:', options: ['A) The system architecture', 'B) The functionality to be built', 'C) The design process', 'D) The hardware requirements'], answer: 'B) The functionality to be built' },
+    { type: 'mc', question: 'Feasible requirements are:', options: ['A) Easy to implement', 'B) Highly complex', 'C) Impractical to achieve', 'D) Implementable within known limitations'], answer: 'D) Implementable within known limitations' },
+    { type: 'mc', question: 'Necessary requirements document:', options: ['A) Capabilities that customers truly need', 'B) Every possible feature', 'C) Optional enhancements', 'D) All technical details'], answer: 'A) Capabilities that customers truly need' },
+    { type: 'mc', question: 'Prioritized requirements indicate:', options: ['A) The number of requirements', 'B) The implementation priority', 'C) The project scope', 'D) The budget allocation'], answer: 'B) The implementation priority' },
+    { type: 'mc', question: 'Unambiguous requirements:', options: ['A) Can be interpreted in multiple ways', 'B) Are unclear', 'C) Lead to misunderstandings', 'D) Have a single interpretation'], answer: 'D) Have a single interpretation' },
+    { type: 'mc', question: 'Verifiable requirements can be:', options: ['A) Implemented quickly', 'B) Easily changed', 'C) Tested to ensure they are met', 'D) Ignored in testing'], answer: 'C) Tested to ensure they are met' },
+    { type: 'mc', question: 'Who is responsible for gathering and documenting requirements?', options: ['A) Project manager', 'B) System architect', 'C) Requirements analyst', 'D) Developer'], answer: 'C) Requirements analyst' },
+    { type: 'mc', question: 'What is a common source of requirements?', options: ['A) Project schedule', 'B) Budget estimate', 'C) User questionnaires', 'D) System design'], answer: 'C) User questionnaires' },
+    { type: 'mc', question: 'Observing users at work is a technique to:', options: ['A) Reduce requirements', 'B) Increase cost', 'C) Gather requirements', 'D) Document requirements'], answer: 'C) Gather requirements' },
+    { type: 'mc', question: 'Scenario analysis involves identifying:', options: ['A) Project risks', 'B) User tasks', 'C) System bugs', 'D) Design patterns'], answer: 'B) User tasks' },
+    { type: 'mc', question: 'What does requirements validation ensure?', options: ['A) Clear documentation', 'B) Accurate implementation', 'C) Detailed designs', 'D) Quick development'], answer: 'B) Accurate implementation' },
+    { type: 'mc', question: 'The process of interviewing stakeholders is known as:', options: ['A) Scenario analysis', 'B) Brainstorming', 'C) Requirements elicitation', 'D) JAD sessions'], answer: 'C) Requirements elicitation' },
+    { type: 'mc', question: 'Which technique involves identifying candidates and preparing questions?', options: ['A) Scenario analysis', 'B) Brainstorming', 'C) JAD sessions', 'D) Conducting interviews'], answer: 'D) Conducting interviews' },
+    { type: 'mc', question: 'What is brainstorming?', options: ['A) A criticism-free idea generation technique', 'B) An individual task', 'C) A design specification', 'D) A project management tool'], answer: 'A) A criticism-free idea generation technique' },
+    { type: 'mc', question: 'JAD sessions involve:', options: ['A) Observing users', 'B) Documenting requirements', 'C) A group technique', 'D) Writing code'], answer: 'C) A group technique' },
+    { type: 'mc', question: 'What happens during the consolidation phase in brainstorming?', options: ['A) Generating ideas', 'B) Organizing ideas', 'C) Reviewing and prioritizing ideas', 'D) Ending the session'], answer: 'C) Reviewing and prioritizing ideas' },
+    { type: 'mc', question: 'What is a post-JAD follow-up activity?', options: ['A) Conducting user interviews', 'B) Writing code', 'C) Preparing a session report', 'D) Identifying candidates'], answer: 'C) Preparing a session report' }
+];
+
+
+
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let selectedTFCount = 0;
+        let selectedMCCount = 0;
+        let selectedQuestions = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateRangeValues();
+            shuffleQuestions();
+        });
+
+        function updateRangeValues() {
+            const tfRange = document.getElementById('tfCount');
+            const mcRange = document.getElementById('mcCount');
+            tfRange.max = questions.filter(q => q.type === 'tf').length;
+            mcRange.max = questions.filter(q => q.type === 'mc').length;
+        }
+
+        function updateValue(id, value) {
+            document.getElementById(id).innerText = value;
+        }
+
+        function shuffleQuestions() {
+            for (let i = questions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [questions[i], questions[j]] = [questions[j], questions[i]];
+            }
+        }
+
+        function startExam() {
+            selectedTFCount = parseInt(document.getElementById('tfCount').value);
+            selectedMCCount = parseInt(document.getElementById('mcCount').value);
+            selectedQuestions = getSelectedQuestions();
+            userAnswers = new Array(selectedQuestions.length).fill(null);
+            document.getElementById('homeContainer').style.display = 'none';
+            document.getElementById('prevBtn').style.display = 'inline-block';
+            document.getElementById('nextBtn').style.display = 'inline-block';
+            document.getElementById('submitBtn').style.display = 'inline-block';
+            displayQuestion();
+        }
+
+        function getSelectedQuestions() {
+            const tfQuestions = questions.filter(q => q.type === 'tf').slice(0, selectedTFCount);
+            const mcQuestions = questions.filter(q => q.type === 'mc').slice(0, selectedMCCount);
+            return [...tfQuestions, ...mcQuestions];
+        }
+
+        function displayQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            const questionObj = selectedQuestions[currentQuestionIndex];
+            const questionElement = document.createElement('div');
+            questionElement.classList.add('question', 'active');
+            questionElement.innerHTML = `<p>Question ${currentQuestionIndex + 1}: ${questionObj.question}</p>`;
+
+            if (questionObj.type === 'tf') {
+                questionElement.innerHTML += `
+                    <label style="display:block;"><input type="radio" name="answer" value="T"> True</label>
+                    <label style="display:block;"><input type="radio" name="answer" value="F"> False</label>
+                `;
+            } else if (questionObj.type === 'mc') {
+                questionObj.options.forEach(option => {
+                    questionElement.innerHTML += `
+                        <label style="display:block;"><input type="radio" name="answer" value="${option}"> ${option}</label>
+                    `;
+                });
+            }
+            container.appendChild(questionElement);
+
+            if (userAnswers[currentQuestionIndex] !== null) {
+                const selectedOption = document.querySelector(`input[name="answer"][value="${userAnswers[currentQuestionIndex]}"]`);
+                if (selectedOption) selectedOption.checked = true;
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                saveAnswer();
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < selectedQuestions.length - 1) {
+                saveAnswer();
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+        }
+
+        function saveAnswer() {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            if (selectedOption) {
+                userAnswers[currentQuestionIndex] = selectedOption.value;
+            }
+        }
+
+        function submitExam() {
+            saveAnswer();
+            let score = 0;
+            let correctAnswers = [];
+            selectedQuestions.forEach((question, index) => {
+                if (userAnswers[index] === question.answer) {
+                    score++;
+                } else {
+                    correctAnswers.push({ question: question.question, correctAnswer: question.answer, userAnswer: userAnswers[index] });
+                }
+            });
+
+            const resultContainer = document.getElementById('resultContainer');
+            resultContainer.innerHTML = `<div class="result">You scored ${score} out of ${selectedQuestions.length}</div>`;
+
+            if (score === selectedQuestions.length) {
+                resultContainer.innerHTML += '<div class="result">Congratulations! You got a perfect score!</div>';
+            } else {
+                correctAnswers.forEach(({ question, correctAnswer, userAnswer }) => {
+                    resultContainer.innerHTML += `
+                        <div class="result">
+                            <p>Question: ${question}</p>
+                            <p>Correct Answer: ${correctAnswer}</p>
+                            <p>Your Answer: ${userAnswer}</p>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('prevBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('homeContainer').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
+
+
