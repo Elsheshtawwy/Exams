@@ -65,7 +65,7 @@
     <div class="container">
         <div id="homeContainer" class="home-container">
             <h1>ِChapter5 Exam</h1>
-            <label class="slider-label">Select number of True/False questions:</label>
+            <label class="slider-label">Select number of F/F questions:</label>
             <input type="range" id="tfCount" min="1" max="0" value="5" oninput="updateValue('tfCountValue', this.value)">
             <span id="tfCountValue">1</span>
             <br>
@@ -85,59 +85,59 @@
 
     <script>
       const questions = [
-  { "type": "tf", "question": "The main aim of requirements specification is to systematically organize the requirements arrived during requirements analysis.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document is used as a reference document, not a contract between the development team and the customer.", "answer": "false" },
-  { "type": "tf", "question": "A good SRS document should be concise and should not be ambiguous.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document should focus on the solution aspects of the system.", "answer": "false" },
-  { "type": "tf", "question": "The SRS document serves as a black box specification where only the visible external behavior is documented.", "answer": "true" },
-  { "type": "tf", "question": "Requirements analysis and specification involve two distinct activities: Requirements Gathering and Analysis and Specification.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document should include detailed technical solutions on how the system will be built.", "answer": "false" },
-  { "type": "tf", "question": "The SRS document is reviewed by the customer to ensure all requirements are properly documented.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document is useful as a contract document, but not as a reference document or definition for implementation.", "answer": "false" },
-  { "type": "tf", "question": "The final product will be acceptable to the customer as long as it satisfies all the requirements recorded in the SRS document.", "answer": "true" },
-  { "type": "tf", "question": "Once the SRS document is approved, any subsequent controversies are settled by referring back to the SRS document.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document should be well-structured and easy to change.", "answer": "true" },
-  { "type": "tf", "question": "The person who undertakes requirements analysis and specification is known as a project manager.", "answer": "false" },
-  { "type": "tf", "question": "Requirements analysis and specification are primarily concerned with understanding and documenting user requirements.", "answer": "true" },
-  { "type": "tf", "question": "A good SRS document should be able to trace which part of the specification corresponds to which part of the design and code.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document should include design and implementation details.", "answer": "false" },
-  { "type": "tf", "question": "The requirements documented in the SRS should be expressed in end-user terminology.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document should specify how the system must be built, not just what the system must do.", "answer": "false" },
-  { "type": "tf", "question": "The final output of the requirements analysis phase is the Software Requirements Specification (SRS) Document.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document is only useful during the initial development phase and not for future reference or contract disputes.", "answer": "false" },
-  { "type": "tf", "question": "A well-written SRS document helps in removing inconsistencies and anomalies from the requirements.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document should be consistent and complete, ensuring all requirements are covered.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document should not avoid solution aspects or technical details.", "answer": "false" },
-  { "type": "tf", "question": "The SRS document serves as a basis for all future development activities.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document is sometimes referred to as a functional specification or product specification.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document should include design constraints and project management details.", "answer": "false" },
-  { "type": "tf", "question": "The SRS document should be verifiable, meaning that its requirements should be testable.", "answer": "true" },
-  { "type": "tf", "question": "The requirements analysis and specification phase should avoid documenting how the system will be built.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document should only be used as a statement of user needs and not as a contract document.", "answer": "false" },
-  { "type": "tf", "question": "The SRS document should be reviewed by the customer to ensure it meets all user needs.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document should be ambiguous to cover various interpretations.", "answer": "false" },
-  { "type": "tf", "question": "The SRS document should be easy to trace and verify, ensuring all requirements can be checked against the design and implementation.", "answer": "true" },
-  { "type": "tf", "question": "The person responsible for writing the SRS document is known as the system analyst.", "answer": "true" },
-  { "type": "tf", "question": "Requirements analysis and specification should include detailed project management plans.", "answer": "false" },
-  { "type": "tf", "question": "The SRS document should avoid specifying what needs to be done and focus on how to do it.", "answer": "false" },
-  { "type": "tf", "question": "The final product is considered acceptable if it adheres to the requirements documented in the SRS.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document should be comprehensive but not overly detailed, avoiding unnecessary complexity.", "answer": "true" },
-  { "type": "tf", "question": "A good SRS document should include detailed descriptions of the technical solution.", "answer": "false" },
-  { "type": "tf", "question": "The SRS document should be developed from end-user terminology and may be formalized later.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document should avoid specifying system behavior under various conditions.", "answer": "false" },
-  { "type": "tf", "question": "The SRS document should be clear and unambiguous, detailing exactly what the system should do.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document is reviewed by the development team, not the customer.", "answer": "false" },
-  { "type": "tf", "question": "The requirements in the SRS document should be expressed in technical terms for precise understanding.", "answer": "false" },
-  { "type": "tf", "question": "A good SRS document must be verifiable to ensure all requirements are testable.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document should not include any implementation details or design constraints.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document serves as a comprehensive guide for all aspects of system design and implementation.", "answer": "false" },
-  { "type": "tf", "question": "A well-written SRS document should be easy to change and adapt as requirements evolve.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document should include examples of user interactions to clarify requirements.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document should provide detailed implementation strategies and solutions.", "answer": "false" },
-  { "type": "tf", "question": "The SRS document should avoid providing a contract between the customer and the development team.", "answer": "false" },
-  { "type": "tf", "question": "The SRS document should include only high-level requirements and avoid details about the system's operation.", "answer": "true" },
-  { "type": "tf", "question": "The SRS document is not useful for future reference or contract disputes.", "answer": "false" },
-  { "type": "tf", "question": "The SRS document should be comprehensive enough to cover all aspects of system behavior.", "answer": "true" },
+  { "type": "tf", "question": "The main aim of requirements specification is to systematically organize the requirements arrived during requirements analysis.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document is used as a reference document, not a contract between the development team and the customer.", "answer": "F" },
+  { "type": "tf", "question": "A good SRS document should be concise and should not be ambiguous.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should focus on the solution aspects of the system.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document serves as a black box specification where only the visible external behavior is documented.", "answer": "F" },
+  { "type": "tf", "question": "Requirements analysis and specification involve two distinct activities: Requirements Gathering and Analysis and Specification.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should include detailed technical solutions on how the system will be built.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document is reviewed by the customer to ensure all requirements are properly documented.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document is useful as a contract document, but not as a reference document or definition for implementation.", "answer": "F" },
+  { "type": "tf", "question": "The final product will be acceptable to the customer as long as it satisfies all the requirements recorded in the SRS document.", "answer": "F" },
+  { "type": "tf", "question": "Once the SRS document is approved, any subsequent controversies are settled by referring back to the SRS document.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should be well-structured and easy to change.", "answer": "F" },
+  { "type": "tf", "question": "The person who undertakes requirements analysis and specification is known as a project manager.", "answer": "F" },
+  { "type": "tf", "question": "Requirements analysis and specification are primarily concerned with understanding and documenting user requirements.", "answer": "F" },
+  { "type": "tf", "question": "A good SRS document should be able to trace which part of the specification corresponds to which part of the design and code.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should include design and implementation details.", "answer": "F" },
+  { "type": "tf", "question": "The requirements documented in the SRS should be expressed in end-user terminology.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should specify how the system must be built, not just what the system must do.", "answer": "F" },
+  { "type": "tf", "question": "The final output of the requirements analysis phase is the Software Requirements Specification (SRS) Document.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document is only useful during the initial development phase and not for future reference or contract disputes.", "answer": "F" },
+  { "type": "tf", "question": "A well-written SRS document helps in removing inconsistencies and anomalies from the requirements.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should be consistent and complete, ensuring all requirements are covered.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should not avoid solution aspects or technical details.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document serves as a basis for all future development activities.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document is sometimes referred to as a functional specification or product specification.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should include design constraints and project management details.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should be verifiable, meaning that its requirements should be testable.", "answer": "F" },
+  { "type": "tf", "question": "The requirements analysis and specification phase should avoid documenting how the system will be built.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should only be used as a statement of user needs and not as a contract document.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should be reviewed by the customer to ensure it meets all user needs.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should be ambiguous to cover various interpretations.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should be easy to trace and verify, ensuring all requirements can be checked against the design and implementation.", "answer": "F" },
+  { "type": "tf", "question": "The person responsible for writing the SRS document is known as the system analyst.", "answer": "F" },
+  { "type": "tf", "question": "Requirements analysis and specification should include detailed project management plans.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should avoid specifying what needs to be done and focus on how to do it.", "answer": "F" },
+  { "type": "tf", "question": "The final product is considered acceptable if it adheres to the requirements documented in the SRS.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should be comprehensive but not overly detailed, avoiding unnecessary complexity.", "answer": "F" },
+  { "type": "tf", "question": "A good SRS document should include detailed descriptions of the technical solution.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should be developed from end-user terminology and may be formalized later.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should avoid specifying system behavior under various conditions.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should be clear and unambiguous, detailing exactly what the system should do.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document is reviewed by the development team, not the customer.", "answer": "F" },
+  { "type": "tf", "question": "The requirements in the SRS document should be expressed in technical terms for precise understanding.", "answer": "F" },
+  { "type": "tf", "question": "A good SRS document must be verifiable to ensure all requirements are testable.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should not include any implementation details or design constraints.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document serves as a comprehensive guide for all aspects of system design and implementation.", "answer": "F" },
+  { "type": "tf", "question": "A well-written SRS document should be easy to change and adapt as requirements evolve.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should include examples of user interactions to clarify requirements.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should provide detailed implementation strategies and solutions.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should avoid providing a contract between the customer and the development team.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should include only high-level requirements and avoid details about the system's operation.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document is not useful for future reference or contract disputes.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should be comprehensive enough to cover all aspects of system behavior.", "answer": "F" },
   { "type": "mc", "question": "What is the main goal of the requirements analysis and specification phase?", "options": ["A) To fully understand user requirements", "B) To develop system prototypes", "C) To implement system design", "D) To document system design"], "answer": "A) To fully understand user requirements" },
   { "type": "mc", "question": "Which of the following best describes the function of a Software Requirements Specification (SRS) document?", "options": ["A) It provides detailed implementation strategies", "B) It is a contract between the development team and the customer", "C) It describes the system's internal workings", "D) It details the project management plan"], "answer": "B) It is a contract between the development team and the customer" },
   { "type": "mc", "question": "In the context of SRS, what does 'black box specification' refer to?", "options": ["A) Documenting the internal details of the system", "B) Focusing on the system's input and output behavior", "C) Providing detailed design constraints", "D) Including implementation strategies"], "answer": "B) Focusing on the system's input and output behavior" },
@@ -294,8 +294,8 @@
 
             if (questionObj.type === 'tf') {
                 questionElement.innerHTML += `
-                    <label style="display:block;"><input type="radio" name="answer" value="T"> True</label>
-                    <label style="display:block;"><input type="radio" name="answer" value="F"> False</label>
+                    <label style="display:block;"><input type="radio" name="answer" value="T"> F</label>
+                    <label style="display:block;"><input type="radio" name="answer" value="F"> F</label>
                 `;
             } else if (questionObj.type === 'mc') {
                 questionObj.options.forEach(option => {
@@ -308,7 +308,7 @@
 
             if (userAnswers[currentQuestionIndex] !== null) {
                 const selectedOption = document.querySelector(`input[name="answer"][value="${userAnswers[currentQuestionIndex]}"]`);
-                if (selectedOption) selectedOption.checked = true;
+                if (selectedOption) selectedOption.checked = F;
             }
         }
 
