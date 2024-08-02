@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam for ch1</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f0f8ff;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .question {
+            display: none;
+        }
+        .question.active {
+            display: block;
+        }
+        label {
+            margin-top: 3px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #resultContainer {
+            margin-top: 20px;
+        }
+        .result {
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #555;
+        }
+        .home-container {
+            text-align: center;
+        }
+        .slider-label {
+            display: block;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="homeContainer" class="home-container">
+            <h1>Chapter 1 Exam</h1>
+            <label class="slider-label">Select number of True/False questions:</label>
+            <input type="range" id="tfCount" min="1" max="0" value="5" oninput="updateValue('tfCountValue', this.value)">
+            <span id="tfCountValue">1</span>
+            <br>
+            <label class="slider-label">Select number of Multiple Choice questions:</label>
+            <input type="range" id="mcCount" min="1" max="0" value="5" oninput="updateValue('mcCountValue', this.value)">
+            <span id="mcCountValue">1</span>
+            <br>
+            <button onclick="startExam()">Start the Exam</button>
+        </div>
+        <div id="questionsContainer"></div>
+        <button id="prevBtn" onclick="prevQuestion()" style="display: none;">Previous</button>
+        <button id="nextBtn" onclick="nextQuestion()" style="display: none;">Next</button>
+        <button id="submitBtn" onclick="submitExam()" style="display: none;">Submit</button>
+        <div id="resultContainer"></div>
+    </div>
+    <footer>Developed by Badr El sheshtawy</footer>
+
+    <script>
+        const questions = [
+    // True/False Questions
+    { type: 'tf', question: 'An effective change-control process can minimize the adverse impact of requirements changes.', answer: 'T' },
+    { type: 'tf', question: 'Documented, unambiguous requirements greatly facilitate system testing.', answer: 'T' },
+    { type: 'tf', question: 'Fewer requirements defects are one of the benefits of a high-quality requirements process.', answer: 'T' },
+    { type: 'tf', question: 'Reduced development rework is a possible benefit of a high-quality requirements process.', answer: 'T' },
+    { type: 'tf', question: 'Higher customer and team member satisfaction is a benefit of an effective requirements engineering process.', answer: 'T' },
+    { type: 'tf', question: 'Business requirements describe why the organization is implementing the system.', answer: 'T' },
+    { type: 'tf', question: 'User requirements are unrelated to the user\'s interaction with the product.', answer: 'F' },
+    { type: 'tf', question: 'Functional requirements are also known as behavioral requirements.', answer: 'T' },
+    { type: 'tf', question: 'Requirements specifications should be separated from design details.', answer: 'T' },
+    { type: 'tf', question: 'Scope creep is managed by evaluating new features against the project’s business objectives and strategic vision.', answer: 'T' },
+    { type: 'tf', question: 'Gold plating usually leads to increased customer satisfaction.', answer: 'F' },
+    { type: 'tf', question: 'Minimal specifications often result in a product that meets all customer expectations.', answer: 'F' },
+    { type: 'tf', question: 'Overlooked user classes have no impact on the overall success of the product.', answer: 'F' },
+    { type: 'tf', question: 'Effective requirements engineering leads to faster development and fewer miscommunications.', answer: 'T' },
+    { type: 'tf', question: 'Inaccurate planning often results from frequent requirements changes and missing requirements.', answer: 'T' },
+    
+    // Multiple Choice Questions
+    { type: 'mc', question: 'What does the IEEE Standard Glossary of Software Engineering Terminology define as a requirement?', options: ['A) A design or implementation detail', 'B) A condition or capability needed by a user', 'C) A project planning information', 'D) A testing information'], answer: 'B) A condition or capability needed by a user' },
+    { type: 'mc', question: 'Which of the following is a level of software requirements?', options: ['A) Project planning requirements', 'B) Business requirements', 'C) Testing requirements', 'D) Design requirements'], answer: 'B) Business requirements' },
+    { type: 'mc', question: 'Business requirements:', options: ['A) Represent high-level objectives of the organization', 'B) Describe user goals or tasks', 'C) Specify software functionality', 'D) Are detailed design specifications'], answer: 'A) Represent high-level objectives of the organization' },
+    { type: 'mc', question: 'User requirements describe:', options: ['A) Why the organization is implementing the system', 'B) What the system should do from a technical perspective', 'C) User goals or tasks with the product', 'D) Implementation details'], answer: 'C) User goals or tasks with the product' },
+    { type: 'mc', question: 'Functional requirements:', options: ['A) Are also known as non-behavioral requirements', 'B) Include project planning information', 'C) Specify the software functionality', 'D) Are not needed to develop software'], answer: 'C) Specify the software functionality' },
+    { type: 'mc', question: 'A feature in the context of software requirements is:', options: ['A) A group of unrelated requirements', 'B) A set of logically related functional requirements', 'C) A testing detail', 'D) An implementation detail'], answer: 'B) A set of logically related functional requirements' },
+    { type: 'mc', question: 'Which of the following is NOT included in requirements specifications?', options: ['A) Design details', 'B) Functional requirements', 'C) Business requirements', 'D) User requirements'], answer: 'A) Design details' },
+    { type: 'mc', question: 'Insufficient user involvement can lead to:', options: ['A) Early project completion', 'B) Reduced project costs', 'C) Late-breaking requirements', 'D) Increased user satisfaction'], answer: 'C) Late-breaking requirements' },
+    { type: 'mc', question: 'Creeping user requirements during development often result in:', options: ['A) Reduced project costs', 'B) Projects staying within schedule', 'C) Projects staying within budget', 'D) Delayed project completion'], answer: 'D) Delayed project completion' },
+    { type: 'mc', question: 'Ambiguous requirements:', options: ['A) Lead to clear understanding among developers', 'B) Cause misinterpretation', 'C) Are easily understood by all stakeholders', 'D) Have no impact on project success'], answer: 'B) Cause misinterpretation' },
+    { type: 'mc', question: 'Gold plating involves:', options: ['A) Removing essential features', 'B) Adding unnecessary functionality', 'C) Improving project planning', 'D) Reducing project scope'], answer: 'B) Adding unnecessary functionality' },
+    { type: 'mc', question: 'Minimal specification can lead to:', options: ['A) Clear developer direction', 'B) Meeting all customer expectations', 'C) Developer frustration', 'D) Precise requirements understanding'], answer: 'C) Developer frustration' },
+    { type: 'mc', question: 'Overlooked user classes result in:', options: ['A) Increased customer satisfaction', 'B) All user needs being met', 'C) Some user needs not being met', 'D) Reduced project scope'], answer: 'C) Some user needs not being met' },
+    { type: 'mc', question: 'Inaccurate planning often results from:', options: ['A) Stable requirements', 'B) Detailed design documents', 'C) Frequent requirements changes', 'D) Comprehensive testing'], answer: 'C) Frequent requirements changes' },
+    { type: 'mc', question: 'Effective requirements engineering processes can:', options: ['A) Increase unnecessary rework', 'B) Lead to miscommunications', 'C) Reduce development rework', 'D) Delay project completion'], answer: 'C) Reduce development rework' },
+    ];
+
+
+
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let selectedTFCount = 0;
+        let selectedMCCount = 0;
+        let selectedQuestions = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateRangeValues();
+            shuffleQuestions();
+        });
+
+        function updateRangeValues() {
+            const tfRange = document.getElementById('tfCount');
+            const mcRange = document.getElementById('mcCount');
+            tfRange.max = questions.filter(q => q.type === 'tf').length;
+            mcRange.max = questions.filter(q => q.type === 'mc').length;
+        }
+
+        function updateValue(id, value) {
+            document.getElementById(id).innerText = value;
+        }
+
+        function shuffleQuestions() {
+            for (let i = questions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [questions[i], questions[j]] = [questions[j], questions[i]];
+            }
+        }
+
+        function startExam() {
+            selectedTFCount = parseInt(document.getElementById('tfCount').value);
+            selectedMCCount = parseInt(document.getElementById('mcCount').value);
+            selectedQuestions = getSelectedQuestions();
+            userAnswers = new Array(selectedQuestions.length).fill(null);
+            document.getElementById('homeContainer').style.display = 'none';
+            document.getElementById('prevBtn').style.display = 'inline-block';
+            document.getElementById('nextBtn').style.display = 'inline-block';
+            document.getElementById('submitBtn').style.display = 'inline-block';
+            displayQuestion();
+        }
+
+        function getSelectedQuestions() {
+            const tfQuestions = questions.filter(q => q.type === 'tf').slice(0, selectedTFCount);
+            const mcQuestions = questions.filter(q => q.type === 'mc').slice(0, selectedMCCount);
+            return [...tfQuestions, ...mcQuestions];
+        }
+
+        function displayQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            const questionObj = selectedQuestions[currentQuestionIndex];
+            const questionElement = document.createElement('div');
+            questionElement.classList.add('question', 'active');
+            questionElement.innerHTML = `<p>Question ${currentQuestionIndex + 1}: ${questionObj.question}</p>`;
+
+            if (questionObj.type === 'tf') {
+                questionElement.innerHTML += `
+                    <label style="display:block;"><input type="radio" name="answer" value="T"> True</label>
+                    <label style="display:block;"><input type="radio" name="answer" value="F"> False</label>
+                `;
+            } else if (questionObj.type === 'mc') {
+                questionObj.options.forEach(option => {
+                    questionElement.innerHTML += `
+                        <label style="display:block;"><input type="radio" name="answer" value="${option}"> ${option}</label>
+                    `;
+                });
+            }
+            container.appendChild(questionElement);
+
+            if (userAnswers[currentQuestionIndex] !== null) {
+                const selectedOption = document.querySelector(`input[name="answer"][value="${userAnswers[currentQuestionIndex]}"]`);
+                if (selectedOption) selectedOption.checked = true;
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                saveAnswer();
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < selectedQuestions.length - 1) {
+                saveAnswer();
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+        }
+
+        function saveAnswer() {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            if (selectedOption) {
+                userAnswers[currentQuestionIndex] = selectedOption.value;
+            }
+        }
+
+        function submitExam() {
+            saveAnswer();
+            let score = 0;
+            let correctAnswers = [];
+            selectedQuestions.forEach((question, index) => {
+                if (userAnswers[index] === question.answer) {
+                    score++;
+                } else {
+                    correctAnswers.push({ question: question.question, correctAnswer: question.answer, userAnswer: userAnswers[index] });
+                }
+            });
+
+            const resultContainer = document.getElementById('resultContainer');
+            resultContainer.innerHTML = `<div class="result">You scored ${score} out of ${selectedQuestions.length}</div>`;
+
+            if (score === selectedQuestions.length) {
+                resultContainer.innerHTML += '<div class="result">Congratulations! You got a perfect score!</div>';
+            } else {
+                correctAnswers.forEach(({ question, correctAnswer, userAnswer }) => {
+                    resultContainer.innerHTML += `
+                        <div class="result">
+                            <p>Question: ${question}</p>
+                            <p>Correct Answer: ${correctAnswer}</p>
+                            <p>Your Answer: ${userAnswer}</p>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('prevBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('homeContainer').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
+
+

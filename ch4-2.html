@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam for ch3</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f0f8ff;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .question {
+            display: none;
+        }
+        .question.active {
+            display: block;
+        }
+        label {
+            margin-top: 3px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #resultContainer {
+            margin-top: 20px;
+        }
+        .result {
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #555;
+        }
+        .home-container {
+            text-align: center;
+        }
+        .slider-label {
+            display: block;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="homeContainer" class="home-container">
+            <h1>ِChapter4 Exam</h1>
+            <label class="slider-label">Select number of T/F questions:</label>
+            <input type="range" id="tfCount" min="1" max="0" value="5" oninput="updateValue('tfCountValue', this.value)">
+            <span id="tfCountValue">1</span>
+            <br>
+            <label class="slider-label">Select number of Multiple Choice questions:</label>
+            <input type="range" id="mcCount" min="1" max="0" value="5" oninput="updateValue('mcCountValue', this.value)">
+            <span id="mcCountValue">1</span>
+            <br>
+            <button onclick="startExam()">Start the Exam</button>
+        </div>
+        <div id="questionsContainer"></div>
+        <button id="prevBtn" onclick="prevQuestion()" style="display: none;">Previous</button>
+        <button id="nextBtn" onclick="nextQuestion()" style="display: none;">Next</button>
+        <button id="submitBtn" onclick="submitExam()" style="display: none;">Submit</button>
+        <div id="resultContainer"></div>
+    </div>
+    <footer>Developed by Badr El sheshtawy</footer>
+
+    <script>
+      const questions =[
+      { "type": "tf", "question": "A questionnaire is a set of written questions for obtaining information from individuals.", "answer": "F" },
+  { "type": "tf", "question": "The real or informal system is always the same as the formal one described by documents.", "answer": "F" },
+  { "type": "tf", "question": "Observation is a tool to check the validity of information gathered from other sources.", "answer": "F" },
+  { "type": "tf", "question": "People tend to behave naturally when they are being observed.", "answer": "F" },
+  { "type": "tf", "question": "The process of requirements analysis bridges the gap between system level requirements engineering and software design.", "answer": "F" },
+  { "type": "tf", "question": "Functional requirements describe 'how' a system is to be built.", "answer": "F" },
+  { "type": "tf", "question": "A use case describes a sequence of interactions between a system and an external actor.", "answer": "F" },
+  { "type": "tf", "question": "Non-functional requirements are concerned with 'what' is to be built.", "answer": "F" },
+  { "type": "tf", "question": "Requirements specification is the basis for all subsequent project planning, design, and coding.", "answer": "F" },
+  { "type": "tf", "question": "The SRS should describe design, construction, testing, and project management details.", "answer": "F" },
+  { "type": "tf", "question": "Customers use the SRS to know what product they can expect to be delivered.", "answer": "F" },
+  { "type": "tf", "question": "The SRS is not used by the testing group to develop test plans, cases, and procedures.", "answer": "F" },
+  { "type": "tf", "question": "Legal staff use the SRS to ensure requirements comply with applicable laws and regulations.", "answer": "F" },
+  { "type": "tf", "question": "Document analysis is used to understand the as-is system.", "answer": "F" },
+  { "type": "tf", "question": "Forms and reports describe the informal system used by an organization.", "answer": "F" },
+  { "type": "tf", "question": "A well-designed questionnaire should avoid leading questions.", "answer": "F" },
+  { "type": "tf", "question": "Requirements analysis involves categorizing and organizing requirements into subsets.", "answer": "F" },
+  { "type": "tf", "question": "Requirements validation is not part of requirements engineering.", "answer": "F" },
+  { "type": "tf", "question": "Each requirement should be bounded and unambiguous.", "answer": "F" },
+  { "type": "tf", "question": "The SRS does not need to describe the system's behaviors under various conditions.", "answer": "F" },
+  { "type": "tf", "question": "The primary purpose of a use case diagram is to provide a low-level visual representation of the user requirements.", "answer": "F" },
+  { "type": "tf", "question": "A functional specification is sometimes called a software requirements specification (SRS).", "answer": "F" },
+  { "type": "mc", "question": "What is the primary goal of a questionnaire in requirements gathering?", "options": ["A) To design system prototypes", "B) To obtain information from individuals", "C) To implement system design", "D) To generate new requirements"], "answer": "B) To obtain information from individuals" },
+  { "type": "mc", "question": "Which document describes the formal system used by an organization?", "options": ["A) System Design Document", "B) Policy Manual", "C) User Manual", "D) Project Plan"], "answer": "B) Policy Manual" },
+  { "type": "mc", "question": "What is the purpose of document analysis in requirements engineering?", "options": ["A) To observe processes", "B) To understand the as-is system", "C) To gather user requirements", "D) To design new forms"], "answer": "B) To understand the as-is system" },
+  { "type": "mc", "question": "Which of the following is a drawback of observation as a data collection method?", "options": ["A) It provides detailed insights into processes", "B) It can reveal discrepancies between formal and informal systems", "C) People tend to change their behavior when being observed", "D) It helps in understanding user needs"], "answer": "C) People tend to change their behavior when being observed" },
+  { "type": "mc", "question": "In requirements analysis, what does categorizing and organizing requirements involve?", "options": ["A) Ranking requirements based on customer needs", "B) Implementing the system design", "C) Developing system prototypes", "D) Conducting surveys"], "answer": "A) Ranking requirements based on customer needs" },
+  { "type": "mc", "question": "What is the main focus of a use case?", "options": ["A) Describing system functionality", "B) Illustrating system architecture", "C) Documenting system requirements", "D) Describing a sequence of interactions between a system and an external actor"], "answer": "D) Describing a sequence of interactions between a system and an external actor" },
+  { "type": "mc", "question": "What should the SRS not contain?", "options": ["A) System's behaviors under various conditions", "B) Design, construction, testing, or project management details", "C) Constraints of the system", "D) Functional and non-functional requirements"], "answer": "B) Design, construction, testing, or project management details" },
+  { "type": "mc", "question": "Which of the following is a non-functional requirement?", "options": ["A) The system shall allow users to withdraw cash", "B) The system shall generate a list of patients for each clinic", "C) Time needed to open the page for edit slide functionality should be less", "D) A user shall be able to search appointments"], "answer": "C) Time needed to open the page for edit slide functionality should be less" },
+  { "type": "mc", "question": "What is the purpose of using questionnaires in requirements gathering?", "options": ["A) To improve response rates", "B) To administer the system design", "C) To document system architecture", "D) To explore and expand on a topic during an interview"], "answer": "A) To improve response rates" },
+  { "type": "mc", "question": "Which of the following is not a user of a requirements document?", "options": ["A) Customers", "B) Project Managers", "C) Marketing Department", "D) System Designers"], "answer": "D) System Designers" },
+  { "type": "mc", "question": "Which technique is used to validate the correctness and feasibility of requirements?", "options": ["A) Document Analysis", "B) Observation", "C) Requirements Validation", "D) Use-Case Approach"], "answer": "C) Requirements Validation" },
+  { "type": "mc", "question": "Which of the following best describes a functional requirement?", "options": ["A) Describes 'what' the system should do", "B) Describes 'how' the system should be built", "C) Focuses on system performance", "D) Relates to user interface design"], "answer": "A) Describes 'what' the system should do" },
+  { "type": "mc", "question": "What is the role of an actor in a use case?", "options": ["A) To describe the system's behavior", "B) To provide a visual representation of requirements", "C) To interact with the system to achieve a goal", "D) To document the system requirements"], "answer": "C) To interact with the system to achieve a goal" },
+  { "type": "mc", "question": "Which document serves as the basis for system testing and user documentation?", "options": ["A) System Design Document", "B) Project Plan", "C) Software Requirements Specification (SRS)", "D) Policy Manual"], "answer": "C) Software Requirements Specification (SRS)" },
+  { "type": "mc", "question": "Which of the following is not a method for collecting requirements?", "options": ["A) Observation", "B) Document Analysis", "C) System Design", "D) Questionnaire"], "answer": "C) System Design" },
+  { "type": "mc", "question": "Which technique is used to understand the as-is system and identify areas for improvement?", "options": ["A) Document Analysis", "B) Use-Case Approach", "C) Observation", "D) Requirements Validation"], "answer": "C) Observation" },
+  { "type": "mc", "question": "What should the SRS describe in detail?", "options": ["A) System design and construction", "B) User interface design and layout", "C) System's behaviors under various conditions", "D) Project management and scheduling"], "answer": "C) System's behaviors under various conditions" },
+  { "type": "mc", "question": "Which of the following is a characteristic of a well-designed questionnaire?", "options": ["A) It includes leading questions", "B) It follows good practice guidelines", "C) It avoids clear and specific questions", "D) It is administered without follow-up"], "answer": "B) It follows good practice guidelines" },
+  { "type": "mc", "question": "Which type of requirement describes 'how' a system should be built?", "options": ["A) Functional Requirement", "B) Non-Functional Requirement", "C) Design Constraint", "D) Performance Requirement"], "answer": "C) Design Constraint" },
+  { "type": "mc", "question": "What is the purpose of categorizing requirements in requirements analysis?", "options": ["A) To develop system prototypes", "B) To organize requirements into related subsets", "C) To implement the system design", "D) To gather user feedback"], "answer": "B) To organize requirements into related subsets" },
+  { "type": "mc", "question": "What does the term 'non-functional requirement' refer to?", "options": ["A) What the system should do", "B) How the system should perform", "C) System behavior under various conditions", "D) User interface design"], "answer": "B) How the system should perform" },
+  { "type": "mc", "question": "Which of the following techniques is used to gain insight into the as-is system?", "options": ["A) Requirements Analysis", "B) Use-Case Approach", "C) Observation", "D) Document Analysis"], "answer": "C) Observation" },
+  { "type": "mc", "question": "Which audience relies on the SRS for developing educational materials?", "options": ["A) Marketing Department", "B) Customers", "C) Training Personnel", "D) Legal Staff"], "answer": "C) Training Personnel" },
+  { "type": "mc", "question": "What should a specification include according to the SRS guidelines?", "options": ["A) Design details", "B) System's capabilities and constraints", "C) Construction and testing methods", "D) Project management plans"], "answer": "B) System's capabilities and constraints" },
+  { "type": "mc", "question": "What is a primary purpose of the use-case approach?", "options": ["A) To describe system design", "B) To illustrate system functionality", "C) To document requirements in detail", "D) To represent user requirements visually"], "answer": "D) To represent user requirements visually" },
+  { "type": "mc", "question": "Which of the following best describes a requirement that is 'bounded and unambiguous'?", "options": ["A) It is well-defined and clear", "B) It includes all possible scenarios", "C) It is subject to frequent changes", "D) It focuses on system performance"], "answer": "A) It is well-defined and clear" },
+
+];
+
+
+
+
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let selectedTFCount = 0;
+        let selectedMCCount = 0;
+        let selectedQuestions = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateRangeValues();
+            shuffleQuestions();
+        });
+
+        function updateRangeValues() {
+            const tfRange = document.getElementById('tfCount');
+            const mcRange = document.getElementById('mcCount');
+            tfRange.max = questions.filter(q => q.type === 'tf').length;
+            mcRange.max = questions.filter(q => q.type === 'mc').length;
+        }
+
+        function updateValue(id, value) {
+            document.getElementById(id).innerText = value;
+        }
+
+        function shuffleQuestions() {
+            for (let i = questions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [questions[i], questions[j]] = [questions[j], questions[i]];
+            }
+        }
+
+        function startExam() {
+            selectedTFCount = parseInt(document.getElementById('tfCount').value);
+            selectedMCCount = parseInt(document.getElementById('mcCount').value);
+            selectedQuestions = getSelectedQuestions();
+            userAnswers = new Array(selectedQuestions.length).fill(null);
+            document.getElementById('homeContainer').style.display = 'none';
+            document.getElementById('prevBtn').style.display = 'inline-block';
+            document.getElementById('nextBtn').style.display = 'inline-block';
+            document.getElementById('submitBtn').style.display = 'inline-block';
+            displayQuestion();
+        }
+
+        function getSelectedQuestions() {
+            const tfQuestions = questions.filter(q => q.type === 'tf').slice(0, selectedTFCount);
+            const mcQuestions = questions.filter(q => q.type === 'mc').slice(0, selectedMCCount);
+            return [...tfQuestions, ...mcQuestions];
+        }
+
+        function displayQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            const questionObj = selectedQuestions[currentQuestionIndex];
+            const questionElement = document.createElement('div');
+            questionElement.classList.add('question', 'active');
+            questionElement.innerHTML = `<p>Question ${currentQuestionIndex + 1}: ${questionObj.question}</p>`;
+
+            if (questionObj.type === 'tf') {
+                questionElement.innerHTML += `
+                    <label style="display:block;"><input type="radio" name="answer" value="T"> T</label>
+                    <label style="display:block;"><input type="radio" name="answer" value="F"> F</label>
+                `;
+            } else if (questionObj.type === 'mc') {
+                questionObj.options.forEach(option => {
+                    questionElement.innerHTML += `
+                        <label style="display:block;"><input type="radio" name="answer" value="${option}"> ${option}</label>
+                    `;
+                });
+            }
+            container.appendChild(questionElement);
+
+            if (userAnswers[currentQuestionIndex] !== null) {
+                const selectedOption = document.querySelector(`input[name="answer"][value="${userAnswers[currentQuestionIndex]}"]`);
+                if (selectedOption) selectedOption.checked = F;
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                saveAnswer();
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < selectedQuestions.length - 1) {
+                saveAnswer();
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+        }
+
+        function saveAnswer() {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            if (selectedOption) {
+                userAnswers[currentQuestionIndex] = selectedOption.value;
+            }
+        }
+
+        function submitExam() {
+            saveAnswer();
+            let score = 0;
+            let correctAnswers = [];
+            selectedQuestions.forEach((question, index) => {
+                if (userAnswers[index] === question.answer) {
+                    score++;
+                } else {
+                    correctAnswers.push({ question: question.question, correctAnswer: question.answer, userAnswer: userAnswers[index] });
+                }
+            });
+
+            const resultContainer = document.getElementById('resultContainer');
+            resultContainer.innerHTML = `<div class="result">You scored ${score} out of ${selectedQuestions.length}</div>`;
+
+            if (score === selectedQuestions.length) {
+                resultContainer.innerHTML += '<div class="result">Congratulations! You got a perfect score!</div>';
+            } else {
+                correctAnswers.forEach(({ question, correctAnswer, userAnswer }) => {
+                    resultContainer.innerHTML += `
+                        <div class="result">
+                            <p>Question: ${question}</p>
+                            <p>Correct Answer: ${correctAnswer}</p>
+                            <p>Your Answer: ${userAnswer}</p>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('prevBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('homeContainer').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
+
+

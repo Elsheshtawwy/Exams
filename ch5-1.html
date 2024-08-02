@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam for ch5</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f0f8ff;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .question {
+            display: none;
+        }
+        .question.active {
+            display: block;
+        }
+        label {
+            margin-top: 3px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #resultContainer {
+            margin-top: 20px;
+        }
+        .result {
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #555;
+        }
+        .home-container {
+            text-align: center;
+        }
+        .slider-label {
+            display: block;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="homeContainer" class="home-container">
+            <h1>ِChapter5 Exam</h1>
+            <label class="slider-label">Select number of T/F questions:</label>
+            <input type="range" id="tfCount" min="1" max="0" value="5" oninput="updateValue('tfCountValue', this.value)">
+            <span id="tfCountValue">1</span>
+            <br>
+            <label class="slider-label">Select number of Multiple Choice questions:</label>
+            <input type="range" id="mcCount" min="1" max="0" value="5" oninput="updateValue('mcCountValue', this.value)">
+            <span id="mcCountValue">1</span>
+            <br>
+            <button onclick="startExam()">Start the Exam</button>
+        </div>
+        <div id="questionsContainer"></div>
+        <button id="prevBtn" onclick="prevQuestion()" style="display: none;">Previous</button>
+        <button id="nextBtn" onclick="nextQuestion()" style="display: none;">Next</button>
+        <button id="submitBtn" onclick="submitExam()" style="display: none;">Submit</button>
+        <div id="resultContainer"></div>
+    </div>
+    <footer>Developed by Badr El sheshtawy</footer>
+
+    <script>
+      const questions = [
+  { "type": "tf", "question": "The main aim of requirements specification is to systematically organize the requirements arrived during requirements analysis.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document is used as a reference document, not a contract between the development team and the customer.", "answer": "F" },
+  { "type": "tf", "question": "A good SRS document should be concise and should not be ambiguous.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should focus on the solution aspects of the system.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document serves as a black box specification where only the visible external behavior is documented.", "answer": "F" },
+  { "type": "tf", "question": "Requirements analysis and specification involve two distinct activities: Requirements Gathering and Analysis and Specification.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should include detailed technical solutions on how the system will be built.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document is reviewed by the customer to ensure all requirements are properly documented.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document is useful as a contract document, but not as a reference document or definition for implementation.", "answer": "F" },
+  { "type": "tf", "question": "The final product will be acceptable to the customer as long as it satisfies all the requirements recorded in the SRS document.", "answer": "F" },
+  { "type": "tf", "question": "Once the SRS document is approved, any subsequent controversies are settled by referring back to the SRS document.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should be well-structured and easy to change.", "answer": "F" },
+  { "type": "tf", "question": "The person who undertakes requirements analysis and specification is known as a project manager.", "answer": "F" },
+  { "type": "tf", "question": "Requirements analysis and specification are primarily concerned with understanding and documenting user requirements.", "answer": "F" },
+  { "type": "tf", "question": "A good SRS document should be able to trace which part of the specification corresponds to which part of the design and code.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should include design and implementation details.", "answer": "F" },
+  { "type": "tf", "question": "The requirements documented in the SRS should be expressed in end-user terminology.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should specify how the system must be built, not just what the system must do.", "answer": "F" },
+  { "type": "tf", "question": "The final output of the requirements analysis phase is the Software Requirements Specification (SRS) Document.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document is only useful during the initial development phase and not for future reference or contract disputes.", "answer": "F" },
+  { "type": "tf", "question": "A well-written SRS document helps in removing inconsistencies and anomalies from the requirements.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should be consistent and complete, ensuring all requirements are covered.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should not avoid solution aspects or technical details.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document serves as a basis for all future development activities.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document is sometimes referred to as a functional specification or product specification.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should include design constraints and project management details.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should be verifiable, meaning that its requirements should be testable.", "answer": "F" },
+  { "type": "tf", "question": "The requirements analysis and specification phase should avoid documenting how the system will be built.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should only be used as a statement of user needs and not as a contract document.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should be reviewed by the customer to ensure it meets all user needs.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should be ambiguous to cover various interpretations.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should be easy to trace and verify, ensuring all requirements can be checked against the design and implementation.", "answer": "F" },
+  { "type": "tf", "question": "The person responsible for writing the SRS document is known as the system analyst.", "answer": "F" },
+  { "type": "tf", "question": "Requirements analysis and specification should include detailed project management plans.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should avoid specifying what needs to be done and focus on how to do it.", "answer": "F" },
+  { "type": "tf", "question": "The final product is considered acceptable if it adheres to the requirements documented in the SRS.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should be comprehensive but not overly detailed, avoiding unnecessary complexity.", "answer": "F" },
+  { "type": "tf", "question": "A good SRS document should include detailed descriptions of the technical solution.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should be developed from end-user terminology and may be formalized later.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should avoid specifying system behavior under various conditions.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should be clear and unambiguous, detailing exactly what the system should do.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document is reviewed by the development team, not the customer.", "answer": "F" },
+  { "type": "tf", "question": "The requirements in the SRS document should be expressed in technical terms for precise understanding.", "answer": "F" },
+  { "type": "tf", "question": "A good SRS document must be verifiable to ensure all requirements are testable.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should not include any implementation details or design constraints.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document serves as a comprehensive guide for all aspects of system design and implementation.", "answer": "F" },
+  { "type": "tf", "question": "A well-written SRS document should be easy to change and adapt as requirements evolve.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should include examples of user interactions to clarify requirements.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should provide detailed implementation strategies and solutions.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should avoid providing a contract between the customer and the development team.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should include only high-level requirements and avoid details about the system's operation.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document is not useful for future reference or contract disputes.", "answer": "F" },
+  { "type": "tf", "question": "The SRS document should be comprehensive enough to cover all aspects of system behavior.", "answer": "F" },
+  { "type": "mc", "question": "What is the main goal of the requirements analysis and specification phase?", "options": ["A) To fully understand user requirements", "B) To develop system prototypes", "C) To implement system design", "D) To document system design"], "answer": "A) To fully understand user requirements" },
+  { "type": "mc", "question": "Which of the following best describes the function of a Software Requirements Specification (SRS) document?", "options": ["A) It provides detailed implementation strategies", "B) It is a contract between the development team and the customer", "C) It describes the system's internal workings", "D) It details the project management plan"], "answer": "B) It is a contract between the development team and the customer" },
+  { "type": "mc", "question": "In the context of SRS, what does 'black box specification' refer to?", "options": ["A) Documenting the internal details of the system", "B) Focusing on the system's input and output behavior", "C) Providing detailed design constraints", "D) Including implementation strategies"], "answer": "B) Focusing on the system's input and output behavior" },
+  { "type": "mc", "question": "What should a well-written SRS document avoid?", "options": ["A) Including detailed technical solutions", "B) Being ambiguous", "C) Including user requirements", "D) Being well-structured"], "answer": "A) Including detailed technical solutions" },
+  { "type": "mc", "question": "Why should the SRS document avoid specifying 'how' the system will be built?", "options": ["A) To focus on what needs to be done", "B) To avoid inconsistencies in the requirements", "C) To include implementation details", "D) To ensure it is concise"], "answer": "A) To focus on what needs to be done" },
+  { "type": "mc", "question": "What is a key characteristic of a good SRS document?", "options": ["A) It is detailed and complex", "B) It is easy to change and adapt", "C) It includes extensive design specifications", "D) It avoids being verifiable"], "answer": "B) It is easy to change and adapt" },
+  { "type": "mc", "question": "Which of the following is NOT a primary function of the SRS document?", "options": ["A) Acting as a reference document", "B) Serving as a statement of user needs", "C) Documenting implementation strategies", "D) Acting as a contract document"], "answer": "C) Documenting implementation strategies" },
+  { "type": "mc", "question": "What should the SRS document's focus be according to its intended purpose?", "options": ["A) How to implement the system", "B) What the system should do", "C) Project management aspects", "D) Detailed technical solutions"], "answer": "B) What the system should do" },
+  { "type": "mc", "question": "When is the SRS document reviewed by the customer?", "options": ["A) After the system is fully developed", "B) During the requirements analysis phase", "C) Before the requirements are documented", "D) After the final product is delivered"], "answer": "B) During the requirements analysis phase" },
+  { "type": "mc", "question": "Which property is crucial for a good SRS document to ensure it can be traced?", "options": ["A) It must include detailed technical solutions", "B) It should be verifiable", "C) It should be concise and well-structured", "D) It should be easy to change"], "answer": "C) It should be concise and well-structured" },
+  { "type": "mc", "question": "The SRS document should be verifiable. What does this mean?", "options": ["A) The requirements should be testable", "B) The document should be concise", "C) The system's internal design should be specified", "D) The document should include detailed implementation steps"], "answer": "A) The requirements should be testable" },
+  { "type": "mc", "question": "What is NOT included in the SRS document?", "options": ["A) Functional requirements", "B) Design constraints", "C) Technical implementation details", "D) User requirements"], "answer": "C) Technical implementation details" },
+  { "type": "mc", "question": "How should the SRS document treat user requirements?", "options": ["A) By detailing how they will be implemented", "B) By describing them using end-user terminology", "C) By including design and technical solutions", "D) By avoiding user needs"], "answer": "B) By describing them using end-user terminology" },
+  { "type": "mc", "question": "The SRS document should be concise but must also be...", "options": ["A) Ambiguous", "B) Complex", "C) Complete", "D) Overly detailed"], "answer": "C) Complete" },
+  { "type": "mc", "question": "What should the SRS document include to avoid ambiguities?", "options": ["A) Detailed technical solutions", "B) Clear and unambiguous descriptions of requirements", "C) Extensive design constraints", "D) Implementation strategies"], "answer": "B) Clear and unambiguous descriptions of requirements" },
+  { "type": "mc", "question": "Which of the following describes the 'black box specification' characteristic of the SRS document?", "options": ["A) It includes internal system details", "B) It specifies the system's functionality based on external behavior", "C) It outlines technical implementation details", "D) It provides design constraints"], "answer": "B) It specifies the system's functionality based on external behavior" },
+  { "type": "mc", "question": "The SRS document should serve which of the following purposes?", "options": ["A) To include detailed design specifications", "B) To act as a contract document", "C) To provide technical implementation details", "D) To serve as a project management plan"], "answer": "B) To act as a contract document" },
+  { "type": "mc", "question": "What aspect of the system does the SRS document focus on?", "options": ["A) How the system will be built", "B) What the system needs to do", "C) Detailed design strategies", "D) Project management details"], "answer": "B) What the system needs to do" },
+  { "type": "mc", "question": "Which property of the SRS document ensures that it can be referenced throughout the system's lifecycle?", "options": ["A) Conciseness", "B) Ambiguity", "C) Completeness", "D) Verifiability"], "answer": "C) Completeness" },
+  { "type": "mc", "question": "When should the SRS document be reviewed and finalized?", "options": ["A) After the system has been developed", "B) During the requirements analysis phase", "C) During the design phase", "D) After the system has been tested"], "answer": "B) During the requirements analysis phase" },
+  { "type": "mc", "question": "Which of the following should NOT be included in the SRS document?", "options": ["A) User requirements", "B) System behavior under various conditions", "C) Technical design details", "D) Functional requirements"], "answer": "C) Technical design details" },
+  { "type": "mc", "question": "What is the primary role of a systems analyst in the requirements analysis and specification phase?", "options": ["A) To develop the system design", "B) To collect and analyze data related to user needs", "C) To implement system prototypes", "D) To manage project timelines"], "answer": "B) To collect and analyze data related to user needs" },
+  { "type": "mc", "question": "How should an SRS document handle the system's functionality?", "options": ["A) By specifying detailed implementation steps", "B) By focusing on what the system should do", "C) By including technical constraints", "D) By avoiding any system behavior descriptions"], "answer": "B) By focusing on what the system should do" },
+  { "type": "mc", "question": "The SRS document should include which of the following?", "options": ["A) Design and implementation details", "B) User needs and functional requirements", "C) Detailed project management plans", "D) Technical solutions and constraints"], "answer": "B) User needs and functional requirements" },
+  { "type": "mc", "question": "What is a key feature of the SRS document that helps in resolving disputes?", "options": ["A) Technical design details", "B) Functional requirements and system behavior", "C) Detailed implementation plans", "D) Project management details"], "answer": "B) Functional requirements and system behavior" },
+  { "type": "mc", "question": "Why is it important for the SRS document to avoid specifying 'how' the system will be built?", "options": ["A) To focus on user requirements and functionality", "B) To include technical solutions", "C) To detail project management aspects", "D) To describe implementation strategies"], "answer": "A) To focus on user requirements and functionality" },
+  { "type": "mc", "question": "What aspect of the SRS document ensures it is clear and unambiguous?", "options": ["A) Inclusion of detailed design specifications", "B) Conciseness and completeness", "C) Technical implementation details", "D) Project management details"], "answer": "B) Conciseness and completeness" },
+  { "type": "mc", "question": "The SRS document should be reviewed to ensure...", "options": ["A) It includes detailed technical solutions", "B) It is complete and covers all requirements", "C) It provides design constraints", "D) It specifies how the system will be built"], "answer": "B) It is complete and covers all requirements" },
+  { "type": "mc", "question": "Which property is essential for a good SRS document to ensure traceability?", "options": ["A) Detailed design specifications", "B) Clear and concise requirements", "C) Technical constraints and solutions", "D) Project management plans"], "answer": "B) Clear and concise requirements" },
+  { "type": "mc", "question": "The SRS document should be comprehensive enough to include...", "options": ["A) Detailed technical solutions", "B) User requirements and system behavior", "C) Implementation strategies", "D) Project management details"], "answer": "B) User requirements and system behavior" },
+  { "type": "mc", "question": "Which of the following should the SRS document NOT focus on?", "options": ["A) What the system should do", "B) How the system will be implemented", "C) Functional requirements", "D) System behavior"], "answer": "B) How the system will be implemented" },
+  { "type": "mc", "question": "How should an SRS document be structured to ensure it is easy to adapt?", "options": ["A) By including detailed implementation plans", "B) By being well-organized and clear", "C) By avoiding technical details", "D) By providing extensive design constraints"], "answer": "B) By being well-organized and clear" },
+  { "type": "mc", "question": "In what way does the SRS document act as a contract between the development team and the customer?", "options": ["A) By detailing design constraints", "B) By specifying what the system should do", "C) By including technical implementation details", "D) By outlining project management plans"], "answer": "B) By specifying what the system should do" },
+  { "type": "mc", "question": "What should the SRS document include to support verification?", "options": ["A) Detailed design constraints", "B) Testable requirements", "C) Implementation strategies", "D) Project management details"], "answer": "B) Testable requirements" },
+  { "type": "mc", "question": "What is a key characteristic of a well-structured SRS document?", "options": ["A) It includes implementation details", "B) It is easy to change and adapt", "C) It focuses on system design", "D) It avoids being concise"], "answer": "B) It is easy to change and adapt" },
+  { "type": "mc", "question": "The SRS document should be used as a...", "options": ["A) Design specification", "B) Reference document for all system requirements", "C) Technical solution guide", "D) Project management tool"], "answer": "B) Reference document for all system requirements" },
+  { "type": "mc", "question": "Which of the following is NOT a property of a good SRS document?", "options": ["A) It should be verifiable", "B) It should be easy to trace", "C) It should include detailed technical specifications", "D) It should be consistent"], "answer": "C) It should include detailed technical specifications" },
+  { "type": "mc", "question": "The SRS document should be...", "options": ["A) Detailed in terms of technical solutions", "B) Complete and include all functional requirements", "C) Focused on implementation strategies", "D) Ambiguous to cover various interpretations"], "answer": "B) Complete and include all functional requirements" },
+  { "type": "mc", "question": "Why is it important for the SRS document to be clear and unambiguous?", "options": ["A) To include detailed design constraints", "B) To ensure that requirements can be easily understood and implemented", "C) To provide technical implementation details", "D) To include project management aspects"], "answer": "B) To ensure that requirements can be easily understood and implemented" },
+  { "type": "mc", "question": "Which of the following is an essential property of the SRS document to ensure it remains useful throughout the development process?", "options": ["A) It should be detailed with implementation steps", "B) It should be easy to reference and update", "C) It should focus on how the system will be built", "D) It should include technical solutions"], "answer": "B) It should be easy to reference and update" },
+  { "type": "mc", "question": "What is the purpose of avoiding detailed design constraints in the SRS document?", "options": ["A) To focus on user requirements and system behavior", "B) To include technical solutions", "C) To provide implementation strategies", "D) To specify project management aspects"], "answer": "A) To focus on user requirements and system behavior" },
+  { "type": "mc", "question": "What should the SRS document provide to ensure it can be used as a contract document?", "options": ["A) Technical implementation details", "B) Clear and detailed descriptions of user requirements", "C) Design and development plans", "D) Project management details"], "answer": "B) Clear and detailed descriptions of user requirements" },
+  { "type": "mc", "question": "Which property of the SRS document ensures that it is comprehensive and covers all necessary aspects?", "options": ["A) Conciseness", "B) Completeness", "C) Technical detail", "D) Ambiguity"], "answer": "B) Completeness" },
+  { "type": "mc", "question": "The SRS document should be...", "options": ["A) Detailed in terms of system behavior", "B) Concise and focused on what the system should do", "C) Ambiguous to cover various interpretations", "D) Comprehensive with implementation details"], "answer": "B) Concise and focused on what the system should do" },
+  { "type": "mc", "question": "What role does the SRS document play in resolving future disputes?", "options": ["A) It provides detailed technical solutions", "B) It acts as a contract that specifies what the system should do", "C) It includes project management details", "D) It provides design constraints"], "answer": "B) It acts as a contract that specifies what the system should do" },
+  { "type": "mc", "question": "Which aspect of the SRS document helps in avoiding ambiguities?", "options": ["A) Including design constraints", "B) Clear and precise requirements", "C) Providing technical solutions", "D) Including implementation strategies"], "answer": "B) Clear and precise requirements" },
+  { "type": "mc", "question": "What is the purpose of documenting functional requirements in the SRS?", "options": ["A) To specify how the system will be built", "B) To outline user needs and system behavior", "C) To include technical constraints", "D) To detail project management plans"], "answer": "B) To outline user needs and system behavior" },
+  { "type": "mc", "question": "Which characteristic is essential for a good SRS document to ensure traceability?", "options": ["A) It should include technical solutions", "B) It should be well-organized and clear", "C) It should be complex", "D) It should focus on implementation strategies"], "answer": "B) It should be well-organized and clear" },
+  { "type": "mc", "question": "How should the SRS document treat system behavior under various conditions?", "options": ["A) By providing detailed technical solutions", "B) By focusing on user requirements and functional behavior", "C) By including implementation details", "D) By avoiding any system behavior descriptions"], "answer": "B) By focusing on user requirements and functional behavior" },
+  { "type": "mc", "question": "The SRS document should be...", "options": ["A) Focused on implementation details", "B) Concise and comprehensive", "C) Detailed in design specifications", "D) Ambiguous"], "answer": "B) Concise and comprehensive" },
+  { "type": "mc", "question": "What is the key focus of the SRS document according to its purpose?", "options": ["A) How the system will be built", "B) What the system should do", "C) Detailed design constraints", "D) Implementation strategies"], "answer": "B) What the system should do" },
+  { "type": "mc", "question": "Which aspect of the SRS document ensures it is comprehensive and covers all necessary requirements?", "options": ["A) Detailed design constraints", "B) Clear and concise user requirements", "C) Technical solutions", "D) Implementation strategies"], "answer": "B) Clear and concise user requirements" },
+  { "type": "mc", "question": "The SRS document should include which of the following to ensure clarity and completeness?", "options": ["A) Detailed technical solutions", "B) Clear descriptions of user requirements", "C) Implementation strategies", "D) Project management details"], "answer": "B) Clear descriptions of user requirements" },
+  { "type": "mc", "question": "Which activity is NOT part of the requirements analysis and specification phase?", "options": ["A) Requirements Gathering and Analysis", "B) System Design", "C) Specification", "D) Documentation of requirements"], "answer": "B) System Design" },
+  { "type": "mc", "question": "What is the primary function of the Software Requirements Specification (SRS) document?", "options": ["A) To provide a detailed design specification", "B) To document requirements and serve as a reference", "C) To outline project management plans", "D) To include technical implementation details"], "answer": "B) To document requirements and serve as a reference" },
+  { "type": "mc", "question": "Who is responsible for collecting and analyzing data to understand the system requirements?", "options": ["A) Project Manager", "B) Systems Analyst", "C) Software Developer", "D) Quality Assurance Engineer"], "answer": "B) Systems Analyst" },
+  { "type": "mc", "question": "In the context of an SRS document, what does the term 'black box specification' imply?", "options": ["A) Detailed internal system workings", "B) Documentation of visible external behavior", "C) Specific design constraints", "D) In-depth implementation details"], "answer": "B) Documentation of visible external behavior" },
+  { "type": "mc", "question": "Which property is critical for ensuring that an SRS document can be used as a contract between the development team and the customer?", "options": ["A) Detailed design specifications", "B) Clear and detailed descriptions of user requirements", "C) Project management plans", "D) Technical solutions"], "answer": "B) Clear and detailed descriptions of user requirements" },
+  { "type": "mc", "question": "What should be avoided in an SRS document to maintain focus on what needs to be done rather than how it will be done?", "options": ["A) User requirements", "B) Design constraints", "C) System behavior", "D) Functional requirements"], "answer": "B) Design constraints" },
+  { "type": "mc", "question": "Why is it important for the SRS document to be concise and well-structured?", "options": ["A) To include detailed technical solutions", "B) To ensure ease of change and adaptation", "C) To provide extensive design constraints", "D) To outline project management details"], "answer": "B) To ensure ease of change and adaptation" },
+  { "type": "mc", "question": "What is a major goal of the requirements analysis and specification phase?", "options": ["A) To finalize system design", "B) To remove inconsistencies and document requirements", "C) To implement the system", "D) To gather project management details"], "answer": "B) To remove inconsistencies and document requirements" },
+  { "type": "mc", "question": "What does the term 'traceability' in the context of an SRS document refer to?", "options": ["A) Ability to track changes in design", "B) Ability to link requirements to design and code", "C) Detailed implementation steps", "D) Project management oversight"], "answer": "B) Ability to link requirements to design and code" },
+  { "type": "mc", "question": "The SRS document should be verifiable. What does this imply about the requirements?", "options": ["A) They should include technical solutions", "B) They should be testable and measurable", "C) They should focus on implementation strategies", "D) They should be described in project management terms"], "answer": "B) They should be testable and measurable" },
+  { "type": "mc", "question": "Which of the following is NOT a characteristic of a good SRS document?", "options": ["A) Conciseness", "B) Ambiguity", "C) Consistency", "D) Completeness"], "answer": "B) Ambiguity" },
+  { "type": "mc", "question": "What does 'requirements gathering and analysis' involve in the requirements specification process?", "options": ["A) Designing the system", "B) Collecting and analyzing data to understand system needs", "C) Developing implementation strategies", "D) Managing project timelines"], "answer": "B) Collecting and analyzing data to understand system needs" },
+  { "type": "mc", "question": "Why should an SRS document be well-structured?", "options": ["A) To include detailed design specifications", "B) To facilitate ease of updates and changes", "C) To document project management details", "D) To focus on technical solutions"], "answer": "B) To facilitate ease of updates and changes" },
+  { "type": "mc", "question": "What should the SRS document focus on regarding system functionality?", "options": ["A) How the system will be implemented", "B) What the system should do", "C) Design constraints", "D) Technical specifications"], "answer": "B) What the system should do" },
+  { "type": "mc", "question": "What is the role of the SRS document in future development activities?", "options": ["A) It provides design constraints", "B) It forms the basis for all future development activities", "C) It outlines project management plans", "D) It includes implementation strategies"], "answer": "B) It forms the basis for all future development activities" },
+  { "type": "mc", "question": "Which of the following is NOT a use of the SRS document?", "options": ["A) Statement of user needs", "B) Contract document", "C) Technical design specification", "D) Reference document"], "answer": "C) Technical design specification" },
+  { "type": "mc", "question": "What aspect of the SRS document is crucial for it to serve as a contract?", "options": ["A) Detailed implementation strategies", "B) Clear and precise descriptions of requirements", "C) Technical design specifications", "D) Project management details"], "answer": "B) Clear and precise descriptions of requirements" },
+  { "type": "mc", "question": "What does 'black box specification' in the SRS document imply about system design?", "options": ["A) Detailed internal workings are documented", "B) Only visible external behavior is documented", "C) Technical solutions are included", "D) Design constraints are specified"], "answer": "B) Only visible external behavior is documented" },
+  { "type": "mc", "question": "What should be avoided in the SRS document to ensure it remains focused on user requirements?", "options": ["A) System behavior descriptions", "B) Detailed design constraints", "C) Functional requirements", "D) End-user terminology"], "answer": "B) Detailed design constraints" },
+  { "type": "mc", "question": "The SRS document should be...", "options": ["A) Detailed in terms of technical solutions", "B) Concise and focused on requirements", "C) Ambiguous to cover various interpretations", "D) Comprehensive with design constraints"], "answer": "B) Concise and focused on requirements" },
+  { "type": "mc", "question": "Why is it essential for the SRS document to be complete?", "options": ["A) To include all design constraints", "B) To cover all functional requirements and user needs", "C) To provide detailed technical solutions", "D) To focus on project management plans"], "answer": "B) To cover all functional requirements and user needs" },
+  { "type": "mc", "question": "What does the SRS document avoid to maintain clarity and focus?", "options": ["A) Functional requirements", "B) Implementation details", "C) System behavior descriptions", "D) End-user terminology"], "answer": "B) Implementation details" },
+  { "type": "mc", "question": "Which property ensures that the SRS document is adaptable and easy to update?", "options": ["A) Technical detail", "B) Conciseness and clarity", "C) Comprehensive design specifications", "D) Detailed implementation strategies"], "answer": "B) Conciseness and clarity" },
+  { "type": "mc", "question": "What should the SRS document specify to support verification?", "options": ["A) Technical solutions", "B) Testable requirements", "C) Implementation strategies", "D) Project management details"], "answer": "B) Testable requirements" },
+  { "type": "mc", "question": "How should the SRS document address user needs?", "options": ["A) By detailing how the system will be built", "B) By providing clear descriptions of what the system should do", "C) By including extensive technical specifications", "D) By outlining design constraints"], "answer": "B) By providing clear descriptions of what the system should do" },
+  { "type": "mc", "question": "What ensures that an SRS document is useful throughout the development process?", "options": ["A) Detailed design constraints", "B) Easy reference and update", "C) Extensive implementation details", "D) Project management plans"], "answer": "B) Easy reference and update" },
+  { "type": "mc", "question": "Which aspect of the SRS document helps prevent ambiguities?", "options": ["A) Including design constraints", "B) Clear and precise requirements", "C) Providing technical solutions", "D) Outlining implementation strategies"], "answer": "B) Clear and precise requirements" },
+  { "type": "mc", "question": "What is a critical factor for the SRS document to serve effectively as a reference document?", "options": ["A) Inclusion of technical solutions", "B) Clear documentation of requirements", "C) Detailed design constraints", "D) Extensive implementation strategies"], "answer": "B) Clear documentation of requirements" },
+  { "type": "mc", "question": "What should an SRS document focus on to avoid design constraints?", "options": ["A) Detailed implementation steps", "B) What needs to be done", "C) Technical solutions", "D) Design constraints"], "answer": "B) What needs to be done" },
+  { "type": "mc", "question": "Which of the following properties is NOT essential for a good SRS document?", "options": ["A) Conciseness", "B) Ambiguity", "C) Consistency", "D) Completeness"], "answer": "B) Ambiguity" },
+  { "type": "mc", "question": "Why should an SRS document avoid technical jargon and focus on end-user terminology?", "options": ["A) To ensure technical accuracy", "B) To make the document accessible to non-technical stakeholders", "C) To include detailed design constraints", "D) To outline implementation strategies"], "answer": "B) To make the document accessible to non-technical stakeholders" },
+  { "type": "mc", "question": "What ensures that an SRS document is traceable?", "options": ["A) Detailed design specifications", "B) Ability to link requirements to design and code", "C) Comprehensive project management details", "D) Extensive implementation strategies"], "answer": "B) Ability to link requirements to design and code" },
+  { "type": "mc", "question": "What aspect of an SRS document ensures that requirements can be verified?", "options": ["A) Inclusion of implementation details", "B) Clear, testable requirements", "C) Detailed design constraints", "D) Comprehensive technical specifications"], "answer": "B) Clear, testable requirements" },
+  { "type": "mc", "question": "Why should an SRS document be carefully written?", "options": ["A) To ensure it includes detailed technical solutions", "B) To avoid misunderstandings and provide a clear contract", "C) To cover extensive implementation strategies", "D) To include comprehensive design constraints"], "answer": "B) To avoid misunderstandings and provide a clear contract" },
+  { "type": "mc", "question": "Which of the following is NOT a correct property of a good SRS document?", "options": ["A) Conciseness", "B) Consistency", "C) Ambiguity", "D) Completeness"], "answer": "C) Ambiguity" },
+  { "type": "mc", "question": "What should be the focus of the SRS document to ensure it is useful for development?", "options": ["A) Detailed design specifications", "B) Clear and precise documentation of requirements", "C) Extensive technical solutions", "D) Project management details"], "answer": "B) Clear and precise documentation of requirements" },
+  { "type": "mc", "question": "What role does the SRS document play in settling controversies between development teams and customers?", "options": ["A) Provides design solutions", "B) Acts as a reference document for agreed requirements", "C) Outlines implementation strategies", "D) Includes project management details"], "answer": "B) Acts as a reference document for agreed requirements" },
+  { "type": "mc", "question": "Which of the following is a key characteristic of a good SRS document?", "options": ["A) Technical detail", "B) Ambiguity", "C) Completeness", "D) Extensive design constraints"], "answer": "C) Completeness" },
+  { "type": "mc", "question": "Why is it important for the SRS document to be concise?", "options": ["A) To include detailed technical solutions", "B) To avoid unnecessary complexity and ensure clarity", "C) To provide comprehensive design constraints", "D) To include project management plans"], "answer": "B) To avoid unnecessary complexity and ensure clarity" },
+  { "type": "mc", "question": "What is a crucial aspect of an SRS document for it to serve as a contract between development and customer?", "options": ["A) Detailed technical specifications", "B) Clear and unambiguous requirements", "C) Extensive implementation strategies", "D) Project management details"], "answer": "B) Clear and unambiguous requirements" },
+];
+
+
+
+
+
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let selectedTFCount = 0;
+        let selectedMCCount = 0;
+        let selectedQuestions = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateRangeValues();
+            shuffleQuestions();
+        });
+
+        function updateRangeValues() {
+            const tfRange = document.getElementById('tfCount');
+            const mcRange = document.getElementById('mcCount');
+            tfRange.max = questions.filter(q => q.type === 'tf').length;
+            mcRange.max = questions.filter(q => q.type === 'mc').length;
+        }
+
+        function updateValue(id, value) {
+            document.getElementById(id).innerText = value;
+        }
+
+        function shuffleQuestions() {
+            for (let i = questions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [questions[i], questions[j]] = [questions[j], questions[i]];
+            }
+        }
+
+        function startExam() {
+            selectedTFCount = parseInt(document.getElementById('tfCount').value);
+            selectedMCCount = parseInt(document.getElementById('mcCount').value);
+            selectedQuestions = getSelectedQuestions();
+            userAnswers = new Array(selectedQuestions.length).fill(null);
+            document.getElementById('homeContainer').style.display = 'none';
+            document.getElementById('prevBtn').style.display = 'inline-block';
+            document.getElementById('nextBtn').style.display = 'inline-block';
+            document.getElementById('submitBtn').style.display = 'inline-block';
+            displayQuestion();
+        }
+
+        function getSelectedQuestions() {
+            const tfQuestions = questions.filter(q => q.type === 'tf').slice(0, selectedTFCount);
+            const mcQuestions = questions.filter(q => q.type === 'mc').slice(0, selectedMCCount);
+            return [...tfQuestions, ...mcQuestions];
+        }
+
+        function displayQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            const questionObj = selectedQuestions[currentQuestionIndex];
+            const questionElement = document.createElement('div');
+            questionElement.classList.add('question', 'active');
+            questionElement.innerHTML = `<p>Question ${currentQuestionIndex + 1}: ${questionObj.question}</p>`;
+
+            if (questionObj.type === 'tf') {
+                questionElement.innerHTML += `
+                    <label style="display:block;"><input type="radio" name="answer" value="T"> T</label>
+                    <label style="display:block;"><input type="radio" name="answer" value="F"> F</label>
+                `;
+            } else if (questionObj.type === 'mc') {
+                questionObj.options.forEach(option => {
+                    questionElement.innerHTML += `
+                        <label style="display:block;"><input type="radio" name="answer" value="${option}"> ${option}</label>
+                    `;
+                });
+            }
+            container.appendChild(questionElement);
+
+            if (userAnswers[currentQuestionIndex] !== null) {
+                const selectedOption = document.querySelector(`input[name="answer"][value="${userAnswers[currentQuestionIndex]}"]`);
+                if (selectedOption) selectedOption.checked = F;
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                saveAnswer();
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < selectedQuestions.length - 1) {
+                saveAnswer();
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+        }
+
+        function saveAnswer() {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            if (selectedOption) {
+                userAnswers[currentQuestionIndex] = selectedOption.value;
+            }
+        }
+
+        function submitExam() {
+            saveAnswer();
+            let score = 0;
+            let correctAnswers = [];
+            selectedQuestions.forEach((question, index) => {
+                if (userAnswers[index] === question.answer) {
+                    score++;
+                } else {
+                    correctAnswers.push({ question: question.question, correctAnswer: question.answer, userAnswer: userAnswers[index] });
+                }
+            });
+
+            const resultContainer = document.getElementById('resultContainer');
+            resultContainer.innerHTML = `<div class="result">You scored ${score} out of ${selectedQuestions.length}</div>`;
+
+            if (score === selectedQuestions.length) {
+                resultContainer.innerHTML += '<div class="result">Congratulations! You got a perfect score!</div>';
+            } else {
+                correctAnswers.forEach(({ question, correctAnswer, userAnswer }) => {
+                    resultContainer.innerHTML += `
+                        <div class="result">
+                            <p>Question: ${question}</p>
+                            <p>Correct Answer: ${correctAnswer}</p>
+                            <p>Your Answer: ${userAnswer}</p>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('prevBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('homeContainer').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
+
+
