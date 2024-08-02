@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اختبار الكتروني</title>
+    <title>Software Requirements</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -22,7 +22,7 @@
             background-color: #007bff;
             color: white;
             text-align: center;
-            font-size: 24px;
+            font-size: 26px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             position: fixed;
             top: 0;
@@ -72,6 +72,12 @@
             text-align: center;
         }
 
+        .footer a{
+            text-decoration: none;
+            font-size: 16px;
+            color: #666;
+        }
+
         @media (max-width: 600px) {
             .chapter-btn, .test-btn {
                 font-size: 14px;
@@ -81,7 +87,7 @@
     </style>
 </head>
 <body>
-    <div class="header">اختبار الكتروني</div>
+    <div class="header">Software Requirements</div>
     <div class="container">
         <div id="chaptersContainer" class="chapters">
             <button class="chapter-btn" data-chapter="ch1">ch1</button>
@@ -93,13 +99,13 @@
             <button class="chapter-btn" data-chapter="ch7">ch7</button>
         </div>
         <div id="testsContainer" class="tests hidden">
-            <a href="#" id="test1" class="test-btn" data-test="1">اختبار 1</a>
-            <a href="#" id="test2" class="test-btn" data-test="2">اختبار 2</a>
-            <a href="#" id="test3" class="test-btn" data-test="3">اختبار 3</a>
-            <a href="#" id="test4" class="test-btn" data-test="4">اختبار 4</a>
+            <a href="#" id="test1" class="test-btn" data-test="1">Exam 1</a>
+            <a href="#" id="test2" class="test-btn" data-test="2">Exam 2</a>
+            <a href="#" id="test3" class="test-btn" data-test="3">Exam 3</a>
+            <a href="#" id="test4" class="test-btn" data-test="4">Exam 4</a>
         </div>
     </div>
-    <div class="footer">Developed by Badr Elsheshtawy</div>
+    <div class="footer">Developed by <a href="https://t.me/BadrElsheshtawy" target="_blank">Badr Elsheshtawy</a></div>
 
     <script>
         const links = {
